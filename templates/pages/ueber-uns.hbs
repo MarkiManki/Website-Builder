@@ -1,10 +1,17 @@
 <section class="section reveal">
   <div class="container">
-    <div class="section-head">
-      <span class="eyebrow">Über uns</span>
-      <h1>{{content.ueberUns.title}}</h1>
-      {{#if content.ueberUns.text}}
-        <p class="lede">{{content.ueberUns.text}}</p>
+    <div class="about-grid{{#if images.about}} has-image{{/if}}">
+      <div class="section-head">
+        <span class="eyebrow">Über uns</span>
+        <h1>{{content.ueberUns.title}}</h1>
+        {{#if content.ueberUns.text}}
+          <p class="lede">{{content.ueberUns.text}}</p>
+        {{/if}}
+      </div>
+      {{#if images.about}}
+        <div class="about-media">
+          <img src="{{{images.about.src}}}" alt="{{images.about.alt}}" loading="lazy">
+        </div>
       {{/if}}
     </div>
   </div>

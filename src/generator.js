@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const Handlebars = require('handlebars');
 const { VARIANT_DEFAULTS, PAGE_DEFINITIONS } = require('./data/defaults');
+const { PROFESSIONS, GENERIC_FALLBACK } = require('./data/professions');
+const { getImages } = require('./images');
 
 const TEMPLATES_DIR = path.join(__dirname, '..', 'templates');
 const OUTPUT_DIR = path.join(__dirname, '..', 'output');
@@ -78,6 +80,30 @@ function buildContext(formData) {
   };
 }
 
+// Sucht passende Symbolbilder (Pexels) für Hero/Über-uns/Leistungen anhand der
+// gewählten Branche. Ohne konfigurierten API-Key liefert getImages() leere
+// Arrays, sodass images.* einfach null bleibt und die Templates ohne Bilder
+// rendern (siehe {{#if images.hero}} in den Seiten-Templates).
+async function resolveImages(formData, type) {
+  const professionKey = formData.business && formData.business.profession;
+  const profession = professionKey ? PROFESSIONS.find((p) => p.key === professionKey) : null;
+  const fallback = GENERIC_FALLBACK[type];
+  const terms = (profession || fallback).searchTerms;
+  const label = profession ? profession.label : fallback.label;
+
+  const queries = terms[1] && terms[1] !== terms[0] ? [terms[0], terms[1]] : [terms[0]];
+  const results = await Promise.all(queries.map((term) => getImages(term, 3)));
+  const pool = [].concat(...results);
+
+  const withAlt = (image) => (image ? { src: image.src, alt: `${label} – Symbolbild` } : null);
+
+  return {
+    hero: withAlt(pool[0]),
+    about: withAlt(pool[1] || pool[0]),
+    services: withAlt(pool[2] || pool[1] || pool[0]),
+  };
+}
+
 function renderPage(pageKey, context, options = {}) {
   const templateFile = PAGE_TEMPLATE_FILES[pageKey];
   if (!templateFile) return null;
@@ -106,9 +132,10 @@ function renderPage(pageKey, context, options = {}) {
 // CSS wird inline eingebettet (kein Dateisystem im iframe verfügbar) und
 // interne Links werden per postMessage an das Eltern-Fenster abgefangen,
 // damit man im Vorschau-iframe zwischen den Seiten klicken kann.
-function renderPreview(formData) {
+async function renderPreview(formData) {
   registerPartials();
   const context = buildContext(formData);
+  context.images = await resolveImages(formData, context.type);
 
   const pages = {};
   const pageKeyByFile = {};
@@ -128,9 +155,10 @@ function renderPreview(formData) {
   };
 }
 
-function generateSite(formData) {
+async function generateSite(formData) {
   registerPartials();
   const context = buildContext(formData);
+  context.images = await resolveImages(formData, context.type);
 
   const slug = `${slugify(formData.business && formData.business.name)}-${Date.now()}`;
   const siteDir = path.join(OUTPUT_DIR, slug);

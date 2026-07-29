@@ -19,11 +19,25 @@ npm start        # startet das Tool
 Danach im Browser öffnen: **http://localhost:3000**
 
 1. Kundentyp wählen: Freelancer oder Kleines Unternehmen
-2. Unternehmensdaten eintragen (Name, Kontakt, Primärfarbe, ...)
+2. Unternehmensdaten eintragen (Name, Kontakt, Primärfarbe, Branche, ...)
 3. Gewünschte Seiten per Checkbox aktivieren (Home & Impressum sind immer dabei)
 4. Inhalte für die aktivierten Seiten ausfüllen
 5. Impressumsdaten eintragen (Pflichtangaben)
 6. Auf "Website generieren" klicken → es wird automatisch eine ZIP-Datei heruntergeladen
+
+### Automatische Fotos (optional, aber empfohlen)
+
+Passend zur gewählten Branche lädt das Tool automatisch lizenzfreie Stockfotos von
+[Pexels](https://www.pexels.com) (kostenlos, keine Attribution nötig). Dafür einmalig:
+
+1. Kostenlosen API-Key holen: https://www.pexels.com/api/ (nur E-Mail, keine Kreditkarte)
+2. Datei `.env.example` im Projektordner kopieren und in `.env` umbenennen
+3. In der `.env`-Datei den Key eintragen: `PEXELS_API_KEY=euer-key`
+4. `npm start` neu starten
+
+Ohne Key funktioniert das Tool ganz normal weiter, nur ohne automatische Fotos.
+Die `.env`-Datei landet nie auf GitHub (steht in `.gitignore`) – bei einem Wechsel
+auf einen anderen Rechner muss sie dort einmalig neu angelegt werden.
 
 Die ZIP-Datei enthält die fertige Website (`index.html`, `impressum.html`, `css/...`) –
 einfach den Inhalt per FTP/Datei-Upload beim Hosting-Anbieter hochladen.
@@ -52,13 +66,21 @@ Im Formular sichtbar, aber noch nicht umgesetzt (Phase 2, als "demnächst" marki
 ## Projektstruktur
 
 ```
-server.js               Express-Server: liefert das Formular aus, nimmt Eingaben entgegen
-src/generator.js         Baut aus den Formulardaten die fertigen HTML-Seiten
-src/data/defaults.js     Verfügbare Seiten + Standardwerte je Kundentyp (Farben, Schriften)
-templates/               HTML-Bausteine (Handlebars) + Basis-CSS der generierten Website
-public/                  Formular-Oberfläche des Builder-Tools selbst
-output/                  Generierte Websites (wird lokal erzeugt, nicht eingecheckt)
+server.js                 Express-Server: liefert das Formular aus, nimmt Eingaben entgegen
+src/generator.js           Baut aus den Formulardaten die fertigen HTML-Seiten
+src/images.js               Bildersuche über die Pexels-API (inkl. Cache)
+src/data/defaults.js       Verfügbare Seiten + Standardwerte je Kundentyp (Farben, Schriften)
+src/data/professions.js     Branchen-Liste fürs Dropdown + Bildersuchbegriffe
+templates/                 HTML-Bausteine (Handlebars) + Basis-CSS/JS der generierten Website
+public/                    Formular-Oberfläche des Builder-Tools selbst
+output/                    Generierte Websites (wird lokal erzeugt, nicht eingecheckt)
 ```
+
+## Neue Branchen hinzufügen (für später)
+
+Einfach einen neuen Eintrag in `src/data/professions.js` ergänzen (Key, deutsches
+Label, Kategorie `freelancer`/`unternehmen` und 1-2 englische Suchbegriffe für
+Pexels). Taucht danach automatisch im Formular-Dropdown auf.
 
 ## Neue Seiten-Bausteine hinzufügen (für später)
 

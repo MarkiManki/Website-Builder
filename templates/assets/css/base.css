@@ -296,6 +296,67 @@ a:hover { text-decoration: underline; }
   margin: 0 0 0.4rem;
 }
 
+.hero-grid {
+  display: block;
+}
+
+.hero-grid.has-image {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+  gap: clamp(2rem, 4vw, 4rem);
+}
+
+.hero-grid.has-image .hero-inner {
+  max-width: none;
+}
+
+.hero-media img,
+.about-media img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: calc(var(--radius) + 6px);
+  box-shadow: var(--shadow-lg);
+}
+
+.section-banner {
+  margin-bottom: 2.5rem;
+  border-radius: calc(var(--radius) + 6px);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.section-banner img {
+  width: 100%;
+  height: clamp(220px, 32vw, 360px);
+  object-fit: cover;
+  display: block;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.about-grid.has-image {
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 860px) {
+  .hero-grid.has-image,
+  .about-grid.has-image {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-grid.has-image .hero-media {
+    order: -1;
+  }
+}
+
 /* ---------- Sections ---------- */
 .section {
   padding: clamp(3.5rem, 5vw, 6rem) 0;

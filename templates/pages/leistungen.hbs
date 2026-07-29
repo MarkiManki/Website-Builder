@@ -12,6 +12,11 @@
 
 <section class="section section-muted reveal">
   <div class="container">
+    {{#if images.services}}
+      <div class="section-banner">
+        <img src="{{{images.services.src}}}" alt="{{images.services.alt}}" loading="lazy">
+      </div>
+    {{/if}}
     <div class="card-grid">
       {{#each content.leistungen.services}}
         <div class="card">

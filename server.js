@@ -1,7 +1,10 @@
+require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const archiver = require('archiver');
 const { generateSite, renderPreview, slugify } = require('./src/generator');
+const { PROFESSIONS } = require('./src/data/professions');
+const { isConfigured: isImageSearchConfigured } = require('./src/images');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,9 +12,16 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.post('/preview', (req, res) => {
+app.get('/professions', (req, res) => {
+  res.json({
+    professions: PROFESSIONS.map(({ key, label, category }) => ({ key, label, category })),
+    imagesEnabled: isImageSearchConfigured(),
+  });
+});
+
+app.post('/preview', async (req, res) => {
   try {
-    const preview = renderPreview(req.body || {});
+    const preview = await renderPreview(req.body || {});
     res.json(preview);
   } catch (err) {
     console.error(err);
@@ -19,9 +29,9 @@ app.post('/preview', (req, res) => {
   }
 });
 
-app.post('/generate', (req, res) => {
+app.post('/generate', async (req, res) => {
   try {
-    const { slug, siteDir } = generateSite(req.body || {});
+    const { slug, siteDir } = await generateSite(req.body || {});
 
     const downloadName = `${slugify((req.body.business && req.body.business.name) || slug)}.zip`;
     res.setHeader('Content-Type', 'application/zip');

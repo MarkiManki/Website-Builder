@@ -64,7 +64,13 @@
         <label class="span-2">Adresse
           <input type="text" name="business.address" placeholder="Musterstraße 1, 12345 Musterstadt">
         </label>
+        <label class="span-2">Branche / Tätigkeit
+          <select name="business.profession" id="profession-select">
+            <option value="">Sonstiges / kein Schwerpunkt</option>
+          </select>
+        </label>
       </div>
+      <p class="hint" id="images-hint">Passende Fotos werden automatisch anhand der Branche geladen, sobald ein Pexels-API-Key eingerichtet ist (siehe README).</p>
     </section>
 
     <section class="panel">

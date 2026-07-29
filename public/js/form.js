@@ -19,6 +19,52 @@
     });
   });
 
+  // --- Branchen-Dropdown (steuert die automatische Bildersuche) ---
+  const professionSelect = document.getElementById('profession-select');
+  const imagesHint = document.getElementById('images-hint');
+  let allProfessions = [];
+
+  function currentType() {
+    const checked = form.querySelector('input[name="type"]:checked');
+    return checked ? checked.value : 'freelancer';
+  }
+
+  function renderProfessionOptions() {
+    const type = currentType();
+    const previousValue = professionSelect.value;
+    professionSelect.innerHTML = '<option value="">Sonstiges / kein Schwerpunkt</option>';
+    allProfessions
+      .filter((profession) => profession.category === type)
+      .forEach((profession) => {
+        const option = document.createElement('option');
+        option.value = profession.key;
+        option.textContent = profession.label;
+        professionSelect.appendChild(option);
+      });
+    if (professionSelect.querySelector(`option[value="${previousValue}"]`)) {
+      professionSelect.value = previousValue;
+    }
+  }
+
+  fetch('/professions')
+    .then((response) => response.json())
+    .then((data) => {
+      allProfessions = data.professions || [];
+      renderProfessionOptions();
+      if (imagesHint) {
+        imagesHint.textContent = data.imagesEnabled
+          ? 'Passende Fotos werden automatisch anhand der Branche geladen.'
+          : 'Damit passende Fotos automatisch geladen werden, richtet einen kostenlosen Pexels-API-Key ein (siehe README).';
+      }
+    })
+    .catch((err) => console.error('Branchenliste konnte nicht geladen werden:', err));
+
+  document.querySelectorAll('input[name="type"]').forEach((radio) => {
+    radio.addEventListener('change', () => {
+      if (radio.checked) renderProfessionOptions();
+    });
+  });
+
   // --- Bedingte Abschnitte ein-/ausblenden, wenn eine Seite an-/abgewählt wird ---
   document.querySelectorAll('[data-toggle]').forEach((checkbox) => {
     const target = document.getElementById(checkbox.dataset.toggle);
@@ -218,6 +264,7 @@
       email: 'hallo@lumora-fotostudio.de',
       phone: '+49 30 12345678',
       address: 'Sonnenallee 42, 12045 Berlin',
+      profession: 'photographer',
     },
     primaryColor: '#e8603c',
     home: {
@@ -282,6 +329,7 @@
     setValue('business.email', SAMPLE_DATA.business.email);
     setValue('business.phone', SAMPLE_DATA.business.phone);
     setValue('business.address', SAMPLE_DATA.business.address);
+    setValue('business.profession', SAMPLE_DATA.business.profession);
     setValue('design.primaryColor', SAMPLE_DATA.primaryColor);
 
     setValue('content.home.headline', SAMPLE_DATA.home.headline);
