@@ -5,7 +5,11 @@
   <title>{{seoTitle}}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="{{seoDescription}}">
-  <link rel="stylesheet" href="{{assetPrefix}}css/base.css">
+  {{#if preview}}
+    <style>{{{inlineCss}}}</style>
+  {{else}}
+    <link rel="stylesheet" href="{{assetPrefix}}css/base.css">
+  {{/if}}
   <style>
     :root {
       --primary: {{design.primaryColor}};
@@ -22,5 +26,17 @@
     {{{body}}}
   </main>
   {{> footer}}
+  {{#if preview}}
+  <script>
+    document.addEventListener('click', function (event) {
+      var link = event.target.closest('a[href]');
+      if (!link) return;
+      var href = link.getAttribute('href');
+      if (!href || /^([a-z]+:|#)/i.test(href)) return;
+      event.preventDefault();
+      window.parent.postMessage({ source: 'website-builder-preview', href: href }, '*');
+    });
+  </script>
+  {{/if}}
 </body>
 </html>

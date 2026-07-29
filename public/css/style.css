@@ -23,6 +23,126 @@ body {
 .app-header h1 { margin: 0 0 0.3rem; }
 .app-header p { margin: 0; color: #c7cad1; }
 
+.header-row {
+  max-width: 1400px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-sample {
+  background: transparent;
+  color: #fff;
+  border: 1px solid #6b7280;
+  padding: 0.6rem 1.1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-sample:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Zwei-Spalten-Layout: Formular + Live-Vorschau */
+.builder-layout {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.form-col {
+  flex: 1 1 560px;
+  min-width: 0;
+}
+
+.preview-col {
+  flex: 1 1 480px;
+  min-width: 0;
+  position: sticky;
+  top: 1rem;
+}
+
+.preview-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1f2430;
+  color: #fff;
+  padding: 0.6rem 1rem;
+  border-radius: 10px 10px 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.preview-toolbar-actions button {
+  background: none;
+  border: 1px solid #555;
+  color: #fff;
+  border-radius: 4px;
+  padding: 0.2rem 0.55rem;
+  margin-left: 0.35rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.preview-toolbar-actions button.active {
+  background: #ff6b4a;
+  border-color: #ff6b4a;
+}
+
+.preview-frame-wrap {
+  background: #fff;
+  border: 1px solid #e3e5ea;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 0.75rem;
+  height: 74vh;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+}
+
+#preview-frame {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #e3e5ea;
+  border-radius: 4px;
+  background: #fff;
+}
+
+#preview-frame.mobile-width {
+  width: 375px;
+}
+
+.preview-hint {
+  color: #6b7280;
+  font-size: 0.8rem;
+  margin: 0.5rem 0 0;
+}
+
+@media (max-width: 1100px) {
+  .builder-layout {
+    flex-direction: column;
+  }
+
+  .preview-col {
+    position: static;
+    width: 100%;
+  }
+
+  .preview-frame-wrap {
+    height: 60vh;
+  }
+}
+
 .panel {
   background: #fff;
   border: 1px solid #e3e5ea;

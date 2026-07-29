@@ -77,7 +77,7 @@ function buildContext(formData) {
   };
 }
 
-function renderPage(pageKey, context) {
+function renderPage(pageKey, context, options = {}) {
   const templateFile = PAGE_TEMPLATE_FILES[pageKey];
   if (!templateFile) return null;
 
@@ -95,7 +95,35 @@ function renderPage(pageKey, context) {
     assetPrefix: '',
     seoTitle,
     seoDescription: context.business.tagline || '',
+    preview: !!options.preview,
+    inlineCss: options.preview ? readTemplate('assets/css/base.css') : null,
   });
+}
+
+// Rendert alle aktuell ausgewählten Seiten für die Live-Vorschau im Builder:
+// CSS wird inline eingebettet (kein Dateisystem im iframe verfügbar) und
+// interne Links werden per postMessage an das Eltern-Fenster abgefangen,
+// damit man im Vorschau-iframe zwischen den Seiten klicken kann.
+function renderPreview(formData) {
+  registerPartials();
+  const context = buildContext(formData);
+
+  const pages = {};
+  const pageKeyByFile = {};
+
+  context.enabledPages.forEach((page) => {
+    const html = renderPage(page.key, context, { preview: true });
+    if (html) {
+      pages[page.key] = html;
+      pageKeyByFile[page.file] = page.key;
+    }
+  });
+
+  return {
+    pages,
+    pageKeyByFile,
+    defaultPage: pages.home ? 'home' : Object.keys(pages)[0] || null,
+  };
 }
 
 function generateSite(formData) {
@@ -119,4 +147,4 @@ function generateSite(formData) {
   return { slug, siteDir };
 }
 
-module.exports = { generateSite, slugify, OUTPUT_DIR };
+module.exports = { generateSite, renderPreview, slugify, OUTPUT_DIR };

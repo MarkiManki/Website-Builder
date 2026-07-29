@@ -1,13 +1,23 @@
 const path = require('path');
 const express = require('express');
 const archiver = require('archiver');
-const { generateSite, slugify } = require('./src/generator');
+const { generateSite, renderPreview, slugify } = require('./src/generator');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.post('/preview', (req, res) => {
+  try {
+    const preview = renderPreview(req.body || {});
+    res.json(preview);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Vorschau konnte nicht erzeugt werden.', details: err.message });
+  }
+});
 
 app.post('/generate', (req, res) => {
   try {
