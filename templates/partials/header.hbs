@@ -1,0 +1,14 @@
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="{{assetPrefix}}index.html">
+      {{#if business.logoText}}
+        <span class="brand-text">{{business.logoText}}</span>
+      {{else}}
+        <span class="brand-text">{{business.name}}</span>
+      {{/if}}
+    </a>
+    {{#if business.tagline}}
+      <span class="brand-tagline">{{business.tagline}}</span>
+    {{/if}}
+  </div>
+</header>

@@ -1,0 +1,46 @@
+<section class="hero">
+  <div class="container">
+    <h1>{{content.home.headline}}</h1>
+    {{#if content.home.subheadline}}
+      <p class="hero-sub">{{content.home.subheadline}}</p>
+    {{/if}}
+    {{#if content.home.ctaText}}
+      <a class="btn btn-primary" href="{{content.home.ctaLink}}">{{content.home.ctaText}}</a>
+    {{/if}}
+  </div>
+</section>
+
+{{#if content.home.introText}}
+<section class="section">
+  <div class="container">
+    <p>{{content.home.introText}}</p>
+  </div>
+</section>
+{{/if}}
+
+{{#if pages.leistungen}}
+<section class="section section-muted">
+  <div class="container">
+    <h2>Unsere Leistungen</h2>
+    <div class="card-grid">
+      {{#each content.leistungen.services}}
+        <div class="card">
+          <h3>{{this.name}}</h3>
+          <p>{{this.description}}</p>
+        </div>
+      {{/each}}
+    </div>
+    <a class="btn btn-secondary" href="leistungen.html">Alle Leistungen ansehen</a>
+  </div>
+</section>
+{{/if}}
+
+{{#if pages.kontakt}}
+<section class="section">
+  <div class="container center">
+    <h2>Interesse geweckt?</h2>
+    <p>Nehmen Sie jetzt Kontakt mit uns auf.</p>
+    <a class="btn btn-primary" href="kontakt.html">Kontakt aufnehmen</a>
+  </div>
+</section>
+{{/if}}

@@ -1,0 +1,42 @@
+<section class="section">
+  <div class="container">
+    <h1>Impressum</h1>
+
+    <h2>Angaben gemäß gesetzlicher Anbieterkennzeichnung</h2>
+    <p>
+      {{content.impressum.inhaber}}<br>
+      {{#if content.impressum.firma}}{{content.impressum.firma}}<br>{{/if}}
+      {{content.impressum.strasse}}<br>
+      {{content.impressum.plzOrt}}<br>
+      {{content.impressum.land}}
+    </p>
+
+    <h2>Kontakt</h2>
+    <p>
+      {{#if content.impressum.telefon}}Telefon: {{content.impressum.telefon}}<br>{{/if}}
+      {{#if content.impressum.email}}E-Mail: {{content.impressum.email}}<br>{{/if}}
+    </p>
+
+    {{#if content.impressum.ustId}}
+    <h2>Umsatzsteuer-ID</h2>
+    <p>{{content.impressum.ustId}}</p>
+    {{/if}}
+
+    {{#if content.impressum.handelsregister}}
+    <h2>Handelsregister</h2>
+    <p>{{content.impressum.handelsregister}}</p>
+    {{/if}}
+
+    {{#if content.impressum.aufsichtsbehoerde}}
+    <h2>Aufsichtsbehörde</h2>
+    <p>{{content.impressum.aufsichtsbehoerde}}</p>
+    {{/if}}
+
+    {{#if content.impressum.verantwortlicher}}
+    <h2>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
+    <p>{{content.impressum.verantwortlicher}}</p>
+    {{/if}}
+
+    <p class="impressum-hinweis"><em>Hinweis: Dieses Impressum wurde automatisiert erstellt. Bitte rechtlich prüfen lassen, bevor die Website veröffentlicht wird.</em></p>
+  </div>
+</section>

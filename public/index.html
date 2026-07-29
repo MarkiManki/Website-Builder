@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Website Builder – Internes Tool</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="wrap">
+      <h1>Website Builder</h1>
+      <p>Formular ausfüllen → Website generieren → ZIP herunterladen → auf Hosting hochladen.</p>
+    </div>
+  </header>
+
+  <form id="builder-form" class="wrap">
+
+    <section class="panel">
+      <h2>1. Welche Art von Kunde?</h2>
+      <div class="type-choice">
+        <label class="type-card">
+          <input type="radio" name="type" value="freelancer" checked>
+          <span class="type-card-inner">
+            <strong>Freelancer</strong>
+            <small>Einzelperson, persönlicher Auftritt</small>
+          </span>
+        </label>
+        <label class="type-card">
+          <input type="radio" name="type" value="unternehmen">
+          <span class="type-card-inner">
+            <strong>Kleines Unternehmen</strong>
+            <small>Team, professioneller Auftritt</small>
+          </span>
+        </label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>2. Unternehmensdaten</h2>
+      <div class="grid-2">
+        <label>Name / Firma*
+          <input type="text" name="business.name" required placeholder="z. B. Max Mustermann Fotografie">
+        </label>
+        <label>Slogan / Tagline
+          <input type="text" name="business.tagline" placeholder="z. B. Fotografie mit Herz">
+        </label>
+        <label>Logo-Text (falls abweichend vom Namen)
+          <input type="text" name="business.logoText" placeholder="optional">
+        </label>
+        <label>Primärfarbe
+          <input type="color" name="design.primaryColor" value="#ff6b4a">
+        </label>
+        <label>E-Mail
+          <input type="email" name="business.email" placeholder="kontakt@beispiel.de">
+        </label>
+        <label>Telefon
+          <input type="tel" name="business.phone" placeholder="+49 123 4567890">
+        </label>
+        <label class="span-2">Adresse
+          <input type="text" name="business.address" placeholder="Musterstraße 1, 12345 Musterstadt">
+        </label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>3. Welche Seiten soll die Website haben?</h2>
+      <div class="page-choice" id="page-choice">
+        <label class="page-item">
+          <input type="checkbox" name="pages.home" checked disabled>
+          Startseite (Home) <span class="badge badge-required">Pflicht</span>
+        </label>
+        <label class="page-item">
+          <input type="checkbox" name="pages.ueberUns" data-toggle="section-ueberUns">
+          Über uns / Team
+        </label>
+        <label class="page-item">
+          <input type="checkbox" name="pages.leistungen" data-toggle="section-leistungen">
+          Leistungen / Portfolio
+        </label>
+        <label class="page-item disabled">
+          <input type="checkbox" disabled>
+          Buchungen <span class="badge badge-soon">demnächst</span>
+        </label>
+        <label class="page-item disabled">
+          <input type="checkbox" disabled>
+          Einzelne Leistungs-Detailseiten <span class="badge badge-soon">demnächst</span>
+        </label>
+        <label class="page-item disabled">
+          <input type="checkbox" disabled>
+          Karriere / Stellenangebote <span class="badge badge-soon">demnächst</span>
+        </label>
+        <label class="page-item disabled">
+          <input type="checkbox" disabled>
+          Blog / News <span class="badge badge-soon">demnächst</span>
+        </label>
+        <label class="page-item">
+          <input type="checkbox" name="pages.kontakt" data-toggle="section-kontakt">
+          Kontakt & Anfahrt
+        </label>
+        <label class="page-item">
+          <input type="checkbox" name="pages.impressum" checked disabled>
+          Impressum <span class="badge badge-required">Pflicht</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>4. Inhalte: Startseite</h2>
+      <div class="grid-2">
+        <label class="span-2">Überschrift*
+          <input type="text" name="content.home.headline" required placeholder="z. B. Willkommen bei Mustermann Fotografie">
+        </label>
+        <label class="span-2">Unterüberschrift
+          <input type="text" name="content.home.subheadline" placeholder="z. B. Ihre Momente, professionell festgehalten">
+        </label>
+        <label class="span-2">Einleitungstext
+          <textarea name="content.home.introText" rows="3" placeholder="Kurzer Text über das Angebot..."></textarea>
+        </label>
+        <label>Button-Text (Call-to-Action)
+          <input type="text" name="content.home.ctaText" placeholder="z. B. Jetzt anfragen">
+        </label>
+        <label>Button-Link
+          <input type="text" name="content.home.ctaLink" placeholder="kontakt.html">
+        </label>
+      </div>
+    </section>
+
+    <section class="panel section-toggle" id="section-ueberUns" hidden>
+      <h2>Inhalte: Über uns / Team</h2>
+      <div class="grid-2">
+        <label class="span-2">Titel
+          <input type="text" name="content.ueberUns.title" value="Über uns">
+        </label>
+        <label class="span-2">Text
+          <textarea name="content.ueberUns.text" rows="3" placeholder="Wer seid ihr, was macht euch aus?"></textarea>
+        </label>
+      </div>
+      <h3>Team-Mitglieder</h3>
+      <div id="team-members" class="repeat-list"></div>
+      <button type="button" class="btn-add" data-add="team-members" data-template="team-member-template">+ Teammitglied hinzufügen</button>
+    </section>
+
+    <section class="panel section-toggle" id="section-leistungen" hidden>
+      <h2>Inhalte: Leistungen / Portfolio</h2>
+      <div class="grid-2">
+        <label class="span-2">Titel
+          <input type="text" name="content.leistungen.title" value="Unsere Leistungen">
+        </label>
+        <label class="span-2">Einleitungstext
+          <textarea name="content.leistungen.intro" rows="2" placeholder="Kurze Einleitung zum Angebot..."></textarea>
+        </label>
+      </div>
+      <h3>Leistungen</h3>
+      <div id="services" class="repeat-list"></div>
+      <button type="button" class="btn-add" data-add="services" data-template="service-template">+ Leistung hinzufügen</button>
+    </section>
+
+    <section class="panel section-toggle" id="section-kontakt" hidden>
+      <h2>Inhalte: Kontakt & Anfahrt</h2>
+      <div class="grid-2">
+        <label class="span-2">Titel
+          <input type="text" name="content.kontakt.title" value="Kontakt">
+        </label>
+        <label class="span-2">Einleitungstext
+          <textarea name="content.kontakt.intro" rows="2" placeholder="z. B. Wir freuen uns auf Ihre Nachricht."></textarea>
+        </label>
+        <label class="span-2">Öffnungszeiten
+          <textarea name="content.kontakt.openingHours" rows="2" placeholder="Mo–Fr 9:00–18:00 Uhr"></textarea>
+        </label>
+      </div>
+      <p class="hint">Adresse, Telefon und E-Mail werden aus Schritt 2 übernommen.</p>
+    </section>
+
+    <section class="panel">
+      <h2>5. Impressum <span class="badge badge-required">Pflicht</span></h2>
+      <p class="hint">Rechtlich notwendige Angaben. Bitte im Zweifel juristisch prüfen lassen.</p>
+      <div class="grid-2">
+        <label>Inhaber / Verantwortliche Person*
+          <input type="text" name="content.impressum.inhaber" required placeholder="Max Mustermann">
+        </label>
+        <label>Firma (falls abweichend)
+          <input type="text" name="content.impressum.firma" placeholder="Mustermann Fotografie e.U.">
+        </label>
+        <label class="span-2">Straße & Hausnummer*
+          <input type="text" name="content.impressum.strasse" required placeholder="Musterstraße 1">
+        </label>
+        <label>PLZ & Ort*
+          <input type="text" name="content.impressum.plzOrt" required placeholder="12345 Musterstadt">
+        </label>
+        <label>Land
+          <input type="text" name="content.impressum.land" value="Deutschland">
+        </label>
+        <label>Telefon
+          <input type="tel" name="content.impressum.telefon" placeholder="+49 123 4567890">
+        </label>
+        <label>E-Mail*
+          <input type="email" name="content.impressum.email" required placeholder="kontakt@beispiel.de">
+        </label>
+        <label>USt-IdNr.
+          <input type="text" name="content.impressum.ustId" placeholder="DE123456789">
+        </label>
+        <label>Handelsregister / Nr.
+          <input type="text" name="content.impressum.handelsregister" placeholder="optional">
+        </label>
+        <label class="span-2">Aufsichtsbehörde
+          <input type="text" name="content.impressum.aufsichtsbehoerde" placeholder="optional">
+        </label>
+        <label class="span-2">Verantwortlich für den Inhalt (§ 55 Abs. 2 RStV)
+          <input type="text" name="content.impressum.verantwortlicher" placeholder="Name, Anschrift">
+        </label>
+      </div>
+    </section>
+
+    <div class="submit-row">
+      <button type="submit" id="submit-btn" class="btn-primary-lg">Website generieren (ZIP herunterladen)</button>
+      <span id="status-msg" class="status-msg"></span>
+    </div>
+  </form>
+
+  <!-- Templates für dynamische Zeilen -->
+  <template id="team-member-template">
+    <div class="repeat-row">
+      <input type="text" placeholder="Name" data-field="name">
+      <input type="text" placeholder="Rolle" data-field="role">
+      <input type="text" placeholder="Kurztext" data-field="text">
+      <button type="button" class="btn-remove" title="Entfernen">✕</button>
+    </div>
+  </template>
+
+  <template id="service-template">
+    <div class="repeat-row">
+      <input type="text" placeholder="Name der Leistung" data-field="name">
+      <input type="text" placeholder="Beschreibung" data-field="description">
+      <button type="button" class="btn-remove" title="Entfernen">✕</button>
+    </div>
+  </template>
+
+  <script src="js/form.js"></script>
+</body>
+</html>

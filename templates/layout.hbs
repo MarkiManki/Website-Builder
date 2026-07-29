@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="de" class="theme-{{type}}">
+<head>
+  <meta charset="utf-8">
+  <title>{{seoTitle}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{seoDescription}}">
+  <link rel="stylesheet" href="{{assetPrefix}}css/base.css">
+  <style>
+    :root {
+      --primary: {{design.primaryColor}};
+      --radius: {{design.radius}};
+      --font-heading: {{design.fontHeading}};
+      --font-body: {{design.fontBody}};
+    }
+  </style>
+</head>
+<body>
+  {{> header}}
+  {{> nav}}
+  <main>
+    {{{body}}}
+  </main>
+  {{> footer}}
+</body>
+</html>

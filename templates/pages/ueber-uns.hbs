@@ -1,0 +1,25 @@
+<section class="section">
+  <div class="container">
+    <h1>{{content.ueberUns.title}}</h1>
+    {{#if content.ueberUns.text}}
+      <p>{{content.ueberUns.text}}</p>
+    {{/if}}
+  </div>
+</section>
+
+{{#if content.ueberUns.teamMembers.length}}
+<section class="section section-muted">
+  <div class="container">
+    <h2>Unser Team</h2>
+    <div class="card-grid">
+      {{#each content.ueberUns.teamMembers}}
+        <div class="card">
+          <h3>{{this.name}}</h3>
+          {{#if this.role}}<p class="card-role">{{this.role}}</p>{{/if}}
+          {{#if this.text}}<p>{{this.text}}</p>{{/if}}
+        </div>
+      {{/each}}
+    </div>
+  </div>
+</section>
+{{/if}}
