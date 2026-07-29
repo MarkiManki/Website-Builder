@@ -1,19 +1,26 @@
-<section class="section">
+<section class="section reveal">
   <div class="container">
-    <h1>{{content.ueberUns.title}}</h1>
-    {{#if content.ueberUns.text}}
-      <p>{{content.ueberUns.text}}</p>
-    {{/if}}
+    <div class="section-head">
+      <span class="eyebrow">Über uns</span>
+      <h1>{{content.ueberUns.title}}</h1>
+      {{#if content.ueberUns.text}}
+        <p class="lede">{{content.ueberUns.text}}</p>
+      {{/if}}
+    </div>
   </div>
 </section>
 
 {{#if content.ueberUns.teamMembers.length}}
-<section class="section section-muted">
+<section class="section section-muted reveal">
   <div class="container">
-    <h2>Unser Team</h2>
+    <div class="section-head center">
+      <span class="eyebrow">Team</span>
+      <h2>Die Menschen dahinter</h2>
+    </div>
     <div class="card-grid">
       {{#each content.ueberUns.teamMembers}}
         <div class="card">
+          <div class="card-icon">{{this.name.[0]}}</div>
           <h3>{{this.name}}</h3>
           {{#if this.role}}<p class="card-role">{{this.role}}</p>{{/if}}
           {{#if this.text}}<p>{{this.text}}</p>{{/if}}

@@ -9,6 +9,16 @@
   let currentPreviewPage = 'home';
   let previewTimer = null;
 
+  // Vorschlagsfarbe je Kundentyp (muss zu den Defaults in src/data/defaults.js passen).
+  const VARIANT_PRIMARY_COLOR = { freelancer: '#e8603c', unternehmen: '#4f46e5' };
+  document.querySelectorAll('input[name="type"]').forEach((radio) => {
+    radio.addEventListener('change', () => {
+      if (!radio.checked) return;
+      const colorInput = form.elements['design.primaryColor'];
+      if (colorInput) colorInput.value = VARIANT_PRIMARY_COLOR[radio.value];
+    });
+  });
+
   // --- Bedingte Abschnitte ein-/ausblenden, wenn eine Seite an-/abgewählt wird ---
   document.querySelectorAll('[data-toggle]').forEach((checkbox) => {
     const target = document.getElementById(checkbox.dataset.toggle);
@@ -209,7 +219,7 @@
       phone: '+49 30 12345678',
       address: 'Sonnenallee 42, 12045 Berlin',
     },
-    primaryColor: '#ff6b4a',
+    primaryColor: '#e8603c',
     home: {
       headline: 'Willkommen bei Lumora Fotostudio',
       subheadline: 'Individuelle Fotografie für besondere Momente',

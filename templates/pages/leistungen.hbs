@@ -1,17 +1,21 @@
-<section class="section">
+<section class="section reveal">
   <div class="container">
-    <h1>{{content.leistungen.title}}</h1>
-    {{#if content.leistungen.intro}}
-      <p>{{content.leistungen.intro}}</p>
-    {{/if}}
+    <div class="section-head">
+      <span class="eyebrow">Leistungen</span>
+      <h1>{{content.leistungen.title}}</h1>
+      {{#if content.leistungen.intro}}
+        <p class="lede">{{content.leistungen.intro}}</p>
+      {{/if}}
+    </div>
   </div>
 </section>
 
-<section class="section section-muted">
+<section class="section section-muted reveal">
   <div class="container">
     <div class="card-grid">
       {{#each content.leistungen.services}}
         <div class="card">
+          <div class="card-icon">{{this.name.[0]}}</div>
           <h3>{{this.name}}</h3>
           <p>{{this.description}}</p>
         </div>

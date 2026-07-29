@@ -65,6 +65,7 @@ function buildContext(formData) {
       radius: variantDefaults.radius,
       fontHeading: variantDefaults.fontHeading,
       fontBody: variantDefaults.fontBody,
+      googleFontsUrl: variantDefaults.googleFontsUrl,
     },
     business,
     content,
@@ -97,6 +98,7 @@ function renderPage(pageKey, context, options = {}) {
     seoDescription: context.business.tagline || '',
     preview: !!options.preview,
     inlineCss: options.preview ? readTemplate('assets/css/base.css') : null,
+    inlineJs: options.preview ? readTemplate('assets/js/site.js') : null,
   });
 }
 
@@ -133,7 +135,9 @@ function generateSite(formData) {
   const slug = `${slugify(formData.business && formData.business.name)}-${Date.now()}`;
   const siteDir = path.join(OUTPUT_DIR, slug);
   const cssDir = path.join(siteDir, 'css');
+  const jsDir = path.join(siteDir, 'js');
   fs.mkdirSync(cssDir, { recursive: true });
+  fs.mkdirSync(jsDir, { recursive: true });
 
   context.enabledPages.forEach((page) => {
     const html = renderPage(page.key, context);
@@ -143,6 +147,7 @@ function generateSite(formData) {
   });
 
   fs.copyFileSync(path.join(TEMPLATES_DIR, 'assets/css/base.css'), path.join(cssDir, 'base.css'));
+  fs.copyFileSync(path.join(TEMPLATES_DIR, 'assets/js/site.js'), path.join(jsDir, 'site.js'));
 
   return { slug, siteDir };
 }

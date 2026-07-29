@@ -3,17 +3,19 @@
 const VARIANT_DEFAULTS = {
   freelancer: {
     label: 'Freelancer',
-    primaryColor: '#ff6b4a',
-    fontHeading: '"Poppins", "Segoe UI", sans-serif',
+    primaryColor: '#e8603c',
+    fontHeading: '"Fraunces", Georgia, serif',
     fontBody: '"Inter", "Segoe UI", sans-serif',
-    radius: '14px',
+    radius: '18px',
+    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap',
   },
   unternehmen: {
     label: 'Kleines Unternehmen',
-    primaryColor: '#2563eb',
-    fontHeading: '"Inter", "Segoe UI", sans-serif',
+    primaryColor: '#4f46e5',
+    fontHeading: '"Sora", "Segoe UI", sans-serif',
     fontBody: '"Inter", "Segoe UI", sans-serif',
-    radius: '4px',
+    radius: '12px',
+    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap',
   },
 };
 
