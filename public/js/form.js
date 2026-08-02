@@ -255,57 +255,223 @@
     }
   });
 
-  // --- Beispieldaten ---
-  const SAMPLE_DATA = {
-    business: {
-      name: 'Lumora Fotostudio',
-      tagline: 'Fotografie, die Geschichten erzählt',
-      logoText: 'Lumora',
-      email: 'hallo@lumora-fotostudio.de',
-      phone: '+49 30 12345678',
-      address: 'Sonnenallee 42, 12045 Berlin',
-      profession: 'photographer',
+  // --- Beispieldaten (mehrere Sets zur Auswahl, für schnellen Vergleich) ---
+  const SAMPLE_DATA_SETS = {
+    photographer: {
+      type: 'freelancer',
+      business: {
+        name: 'Lumora Fotostudio',
+        tagline: 'Fotografie, die Geschichten erzählt',
+        logoText: 'Lumora',
+        email: 'hallo@lumora-fotostudio.de',
+        phone: '+49 30 12345678',
+        address: 'Sonnenallee 42, 12045 Berlin',
+        profession: 'photographer',
+      },
+      primaryColor: '#e8603c',
+      home: {
+        headline: 'Willkommen bei Lumora Fotostudio',
+        subheadline: 'Individuelle Fotografie für besondere Momente',
+        introText: 'Wir begleiten Hochzeiten, Portraits und Business-Shootings mit einem Auge fürs Detail und einem Gespür für echte Emotionen.',
+        ctaText: 'Termin anfragen',
+        ctaLink: 'kontakt.html',
+      },
+      ueberUns: {
+        title: 'Über uns',
+        text: 'Seit 2016 halten wir mit Herz und Kamera die schönsten Momente unserer Kund:innen fest.',
+        team: [
+          { name: 'Anna Berger', role: 'Fotografin & Gründerin', text: 'Spezialisiert auf natürliche Portraits.' },
+          { name: 'Jonas Weber', role: 'Fotograf', text: 'Experte für Hochzeits- und Eventfotografie.' },
+        ],
+      },
+      leistungen: {
+        title: 'Unsere Leistungen',
+        intro: 'Von der ersten Idee bis zum fertigen Bild – das bieten wir an:',
+        services: [
+          { name: 'Hochzeitsfotografie', description: 'Der schönste Tag Ihres Lebens, authentisch festgehalten.' },
+          { name: 'Portraitshootings', description: 'Individuelle Portraits für Bewerbung, Business oder privat.' },
+          { name: 'Eventfotografie', description: 'Firmenfeiern, Geburtstage und besondere Anlässe.' },
+        ],
+      },
+      kontakt: {
+        title: 'Kontakt',
+        intro: 'Wir freuen uns auf Ihre Nachricht – meldet euch gerne unverbindlich.',
+        openingHours: 'Mo–Fr 9:00–18:00 Uhr, Termine nach Vereinbarung',
+      },
+      impressum: {
+        inhaber: 'Anna Berger',
+        firma: 'Lumora Fotostudio',
+        strasse: 'Sonnenallee 42',
+        plzOrt: '12045 Berlin',
+        land: 'Deutschland',
+        telefon: '+49 30 12345678',
+        email: 'hallo@lumora-fotostudio.de',
+        ustId: 'DE987654321',
+        verantwortlicher: 'Anna Berger, Sonnenallee 42, 12045 Berlin',
+      },
     },
-    primaryColor: '#e8603c',
-    home: {
-      headline: 'Willkommen bei Lumora Fotostudio',
-      subheadline: 'Individuelle Fotografie für besondere Momente',
-      introText: 'Wir begleiten Hochzeiten, Portraits und Business-Shootings mit einem Auge fürs Detail und einem Gespür für echte Emotionen.',
-      ctaText: 'Termin anfragen',
-      ctaLink: 'kontakt.html',
+
+    'personal-trainer': {
+      type: 'freelancer',
+      business: {
+        name: 'FitForm Personal Training',
+        tagline: 'Individuelles Training für echte Ergebnisse',
+        logoText: 'FitForm',
+        email: 'hallo@fitform-training.de',
+        phone: '+49 176 55501234',
+        address: 'Bergmannstraße 12, 20359 Hamburg',
+        profession: 'personal-trainer',
+      },
+      primaryColor: '#e8603c',
+      home: {
+        headline: 'Erreiche deine Ziele mit FitForm',
+        subheadline: 'Personal Training, das zu deinem Leben passt',
+        introText: 'Ob Kraftaufbau, Abnehmen oder mehr Beweglichkeit – ich erstelle dir ein Trainingskonzept, das wirklich zu dir passt.',
+        ctaText: 'Kostenloses Erstgespräch',
+        ctaLink: 'kontakt.html',
+      },
+      ueberUns: {
+        title: 'Über mich',
+        text: 'Seit 8 Jahren begleite ich Menschen auf dem Weg zu mehr Fitness und Wohlbefinden – individuell, ehrlich, auf Augenhöhe.',
+        team: [
+          { name: 'Jonas Keller', role: 'Personal Trainer, B.Sc. Sportwissenschaft', text: 'Spezialisiert auf Kraft- und Athletiktraining.' },
+        ],
+      },
+      leistungen: {
+        title: 'Trainingsangebote',
+        intro: 'Das biete ich an:',
+        services: [
+          { name: '1:1 Personal Training', description: 'Individuelles Training, ganz auf dich abgestimmt.' },
+          { name: 'Ernährungsberatung', description: 'Praktische Begleitung für nachhaltige Ergebnisse.' },
+          { name: 'Online Coaching', description: 'Trainingspläne und Betreuung, ortsunabhängig.' },
+        ],
+      },
+      kontakt: {
+        title: 'Kontakt',
+        intro: 'Schreib mir für ein kostenloses Erstgespräch.',
+        openingHours: 'Mo–Sa 7:00–20:00 Uhr, Termine nach Vereinbarung',
+      },
+      impressum: {
+        inhaber: 'Jonas Keller',
+        firma: 'FitForm Personal Training',
+        strasse: 'Bergmannstraße 12',
+        plzOrt: '20359 Hamburg',
+        land: 'Deutschland',
+        telefon: '+49 176 55501234',
+        email: 'hallo@fitform-training.de',
+        ustId: '',
+        verantwortlicher: 'Jonas Keller, Bergmannstraße 12, 20359 Hamburg',
+      },
     },
-    ueberUns: {
-      title: 'Über uns',
-      text: 'Seit 2016 halten wir mit Herz und Kamera die schönsten Momente unserer Kund:innen fest.',
-      team: [
-        { name: 'Anna Berger', role: 'Fotografin & Gründerin', text: 'Spezialisiert auf natürliche Portraits.' },
-        { name: 'Jonas Weber', role: 'Fotograf', text: 'Experte für Hochzeits- und Eventfotografie.' },
-      ],
+
+    'cafe-bakery': {
+      type: 'unternehmen',
+      business: {
+        name: 'Bäckerei Sonnenkorn',
+        tagline: 'Frisch gebacken seit 1998',
+        logoText: 'Sonnenkorn',
+        email: 'info@sonnenkorn-baeckerei.de',
+        phone: '+49 351 4890123',
+        address: 'Marktplatz 7, 01067 Dresden',
+        profession: 'cafe-bakery',
+      },
+      primaryColor: '#4f46e5',
+      home: {
+        headline: 'Willkommen bei Bäckerei Sonnenkorn',
+        subheadline: 'Handwerksbäckerei mit Herz und Tradition',
+        introText: 'Jeden Morgen backen wir Brot, Brötchen und Kuchen frisch nach eigenen Rezepten – aus regionalen Zutaten, ganz ohne Zusatzstoffe.',
+        ctaText: 'Öffnungszeiten & Anfahrt',
+        ctaLink: 'kontakt.html',
+      },
+      ueberUns: {
+        title: 'Über uns',
+        text: 'Seit über 25 Jahren führen wir unsere Bäckerei als Familienbetrieb in dritter Generation.',
+        team: [
+          { name: 'Petra Sonnenkorn', role: 'Bäckermeisterin & Inhaberin', text: 'Führt den Betrieb in dritter Generation.' },
+          { name: 'Markus Sonnenkorn', role: 'Konditormeister', text: 'Verantwortlich für Torten und Feingebäck.' },
+        ],
+      },
+      leistungen: {
+        title: 'Unser Angebot',
+        intro: 'Das gibt es bei uns:',
+        services: [
+          { name: 'Frisches Brot & Brötchen', description: 'Täglich frisch gebacken, viele Sorten.' },
+          { name: 'Kuchen & Torten', description: 'Auch nach individueller Bestellung fürs Fest.' },
+          { name: 'Frühstück & Snacks', description: 'Zum Mitnehmen oder Genießen vor Ort.' },
+        ],
+      },
+      kontakt: {
+        title: 'Kontakt & Anfahrt',
+        intro: 'Wir freuen uns auf Ihren Besuch.',
+        openingHours: 'Di–Sa 6:00–18:00 Uhr, So 7:00–12:00 Uhr, Mo Ruhetag',
+      },
+      impressum: {
+        inhaber: 'Petra Sonnenkorn',
+        firma: 'Bäckerei Sonnenkorn GmbH',
+        strasse: 'Marktplatz 7',
+        plzOrt: '01067 Dresden',
+        land: 'Deutschland',
+        telefon: '+49 351 4890123',
+        email: 'info@sonnenkorn-baeckerei.de',
+        ustId: 'DE812345678',
+        handelsregister: 'Amtsgericht Dresden, HRB 45678',
+        verantwortlicher: 'Petra Sonnenkorn, Marktplatz 7, 01067 Dresden',
+      },
     },
-    leistungen: {
-      title: 'Unsere Leistungen',
-      intro: 'Von der ersten Idee bis zum fertigen Bild – das bieten wir an:',
-      services: [
-        { name: 'Hochzeitsfotografie', description: 'Der schönste Tag Ihres Lebens, authentisch festgehalten.' },
-        { name: 'Portraitshootings', description: 'Individuelle Portraits für Bewerbung, Business oder privat.' },
-        { name: 'Eventfotografie', description: 'Firmenfeiern, Geburtstage und besondere Anlässe.' },
-      ],
-    },
-    kontakt: {
-      title: 'Kontakt',
-      intro: 'Wir freuen uns auf Ihre Nachricht – meldet euch gerne unverbindlich.',
-      openingHours: 'Mo–Fr 9:00–18:00 Uhr, Termine nach Vereinbarung',
-    },
-    impressum: {
-      inhaber: 'Anna Berger',
-      firma: 'Lumora Fotostudio',
-      strasse: 'Sonnenallee 42',
-      plzOrt: '12045 Berlin',
-      land: 'Deutschland',
-      telefon: '+49 30 12345678',
-      email: 'hallo@lumora-fotostudio.de',
-      ustId: 'DE987654321',
-      verantwortlicher: 'Anna Berger, Sonnenallee 42, 12045 Berlin',
+
+    'car-repair': {
+      type: 'unternehmen',
+      business: {
+        name: 'AutoService Wagner',
+        tagline: 'Ihr Kfz-Meisterbetrieb seit 2003',
+        logoText: 'Wagner',
+        email: 'werkstatt@autoservice-wagner.de',
+        phone: '+49 221 7789012',
+        address: 'Industriestraße 34, 50735 Köln',
+        profession: 'car-repair',
+      },
+      primaryColor: '#4f46e5',
+      home: {
+        headline: 'AutoService Wagner – Ihre Werkstatt in Köln',
+        subheadline: 'Reparatur, Wartung und Reifenservice aus einer Hand',
+        introText: 'Von der Inspektion bis zur Unfallreparatur – unser Meisterteam kümmert sich zuverlässig um alle Marken.',
+        ctaText: 'Termin vereinbaren',
+        ctaLink: 'kontakt.html',
+      },
+      ueberUns: {
+        title: 'Über uns',
+        text: 'Seit über 20 Jahren sind wir die vertrauensvolle Werkstatt für Kund:innen in Köln und Umgebung.',
+        team: [
+          { name: 'Stefan Wagner', role: 'Kfz-Meister & Inhaber', text: 'Über 25 Jahre Erfahrung im Kfz-Handwerk.' },
+          { name: 'Deniz Yildiz', role: 'Kfz-Mechatroniker', text: 'Spezialist für Elektronik und Diagnose.' },
+        ],
+      },
+      leistungen: {
+        title: 'Unsere Leistungen',
+        intro: 'Das bieten wir an:',
+        services: [
+          { name: 'Inspektion & Wartung', description: 'Nach Herstellervorgaben, alle Marken.' },
+          { name: 'Reifenservice', description: 'Reifenwechsel, Einlagerung, Auswuchten.' },
+          { name: 'Unfallreparatur', description: 'Karosserie- und Lackarbeiten aus einer Hand.' },
+        ],
+      },
+      kontakt: {
+        title: 'Kontakt',
+        intro: 'Vereinbaren Sie einen Termin – wir beraten Sie gerne.',
+        openingHours: 'Mo–Fr 7:30–18:00 Uhr, Sa 9:00–13:00 Uhr',
+      },
+      impressum: {
+        inhaber: 'Stefan Wagner',
+        firma: 'AutoService Wagner GmbH',
+        strasse: 'Industriestraße 34',
+        plzOrt: '50735 Köln',
+        land: 'Deutschland',
+        telefon: '+49 221 7789012',
+        email: 'werkstatt@autoservice-wagner.de',
+        ustId: 'DE756412398',
+        handelsregister: 'Amtsgericht Köln, HRB 98123',
+        verantwortlicher: 'Stefan Wagner, Industriestraße 34, 50735 Köln',
+      },
     },
   };
 
@@ -323,6 +489,17 @@
   }
 
   function fillSampleData() {
+    const setKey = document.getElementById('sample-data-select').value;
+    const SAMPLE_DATA = SAMPLE_DATA_SETS[setKey];
+    if (!SAMPLE_DATA) return;
+
+    // Kundentyp zuerst setzen: steuert Branchen-Dropdown-Optionen und Standardfarbe.
+    const typeRadio = form.querySelector(`input[name="type"][value="${SAMPLE_DATA.type}"]`);
+    if (typeRadio) {
+      typeRadio.checked = true;
+      typeRadio.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
     setValue('business.name', SAMPLE_DATA.business.name);
     setValue('business.tagline', SAMPLE_DATA.business.tagline);
     setValue('business.logoText', SAMPLE_DATA.business.logoText);
@@ -355,6 +532,8 @@
     setValue('content.kontakt.intro', SAMPLE_DATA.kontakt.intro);
     setValue('content.kontakt.openingHours', SAMPLE_DATA.kontakt.openingHours);
 
+    ['inhaber', 'firma', 'strasse', 'plzOrt', 'land', 'telefon', 'email', 'ustId', 'handelsregister', 'aufsichtsbehoerde', 'verantwortlicher']
+      .forEach((field) => setValue(`content.impressum.${field}`, ''));
     Object.keys(SAMPLE_DATA.impressum).forEach((field) => {
       setValue(`content.impressum.${field}`, SAMPLE_DATA.impressum[field]);
     });
@@ -365,6 +544,38 @@
   }
 
   document.getElementById('sample-data-btn').addEventListener('click', fillSampleData);
+
+  // --- Im Browser öffnen (schreibt die aktuelle Version auf die Platte und öffnet sie in einem neuen Tab) ---
+  const openBrowserBtn = document.getElementById('open-browser-btn');
+  openBrowserBtn.addEventListener('click', async () => {
+    openBrowserBtn.disabled = true;
+    statusMsg.textContent = 'Website wird vorbereitet…';
+    statusMsg.className = 'status-msg';
+
+    try {
+      const payload = buildFormData();
+      const response = await fetch('/open', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errBody = await response.json().catch(() => ({}));
+        throw new Error(errBody.details || errBody.error || `Serverfehler (${response.status})`);
+      }
+
+      const data = await response.json();
+      window.open(data.url, '_blank');
+      statusMsg.textContent = 'Website in neuem Tab geöffnet.';
+      statusMsg.className = 'status-msg success';
+    } catch (err) {
+      statusMsg.textContent = `Fehler: ${err.message}`;
+      statusMsg.className = 'status-msg error';
+    } finally {
+      openBrowserBtn.disabled = false;
+    }
+  });
 
   // Vorschau direkt beim Laden einmal aufbauen (Home + Impressum sind immer aktiv).
   schedulePreviewUpdate();

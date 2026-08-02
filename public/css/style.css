@@ -48,6 +48,26 @@ body {
   background: rgba(255, 255, 255, 0.08);
 }
 
+.sample-data-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.sample-data-controls select {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  border: 1px solid #6b7280;
+  border-radius: 6px;
+  padding: 0.58rem 0.7rem;
+  font-size: 0.9rem;
+}
+
+.sample-data-controls select option {
+  color: #1f2430;
+}
+
 /* Zwei-Spalten-Layout: Formular + Live-Vorschau */
 .builder-layout {
   max-width: 1400px;
@@ -328,6 +348,27 @@ textarea { resize: vertical; }
 }
 
 .btn-primary-lg:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary-lg {
+  background: transparent;
+  color: #1f2430;
+  border: 1.5px solid #1f2430;
+  padding: 0.9rem 1.8rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-secondary-lg:hover {
+  background: #1f2430;
+  color: #fff;
+}
+
+.btn-secondary-lg:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }

@@ -13,7 +13,15 @@
         <h1>Website Builder</h1>
         <p>Formular ausfüllen → Website generieren → ZIP herunterladen → auf Hosting hochladen.</p>
       </div>
-      <button type="button" id="sample-data-btn" class="btn-sample">Beispieldaten einfügen</button>
+      <div class="sample-data-controls">
+        <select id="sample-data-select">
+          <option value="photographer">Fotograf:in (Freelancer)</option>
+          <option value="personal-trainer">Personal Trainer (Freelancer)</option>
+          <option value="cafe-bakery">Café / Bäckerei (Unternehmen)</option>
+          <option value="car-repair">Kfz-Werkstatt (Unternehmen)</option>
+        </select>
+        <button type="button" id="sample-data-btn" class="btn-sample">Beispieldaten einfügen</button>
+      </div>
     </div>
   </header>
 
@@ -224,6 +232,7 @@
 
     <div class="submit-row">
       <button type="submit" id="submit-btn" class="btn-primary-lg">Website generieren (ZIP herunterladen)</button>
+      <button type="button" id="open-browser-btn" class="btn-secondary-lg">Im Browser öffnen</button>
       <span id="status-msg" class="status-msg"></span>
     </div>
   </form>
