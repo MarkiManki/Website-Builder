@@ -1,9 +1,9 @@
 (function () {
-  // Header bekommt beim Scrollen einen Schatten/Rand.
-  var header = document.querySelector('.site-header');
-  if (header) {
+  // Topbar (Header + Nav) bekommt beim Scrollen einen Schatten.
+  var topbar = document.querySelector('.site-topbar');
+  if (topbar) {
     var onScroll = function () {
-      header.classList.toggle('is-scrolled', window.scrollY > 8);
+      topbar.classList.toggle('is-scrolled', window.scrollY > 8);
     };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });

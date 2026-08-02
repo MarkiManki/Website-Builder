@@ -110,20 +110,18 @@ a:hover { text-decoration: underline; }
 }
 
 /* ---------- Header & Navigation ---------- */
-.site-header {
+/* Header + Nav bilden zusammen EINE farbige Leiste (kein weißer Hintergrund). */
+.site-topbar {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: saturate(180%) blur(14px);
-  -webkit-backdrop-filter: saturate(180%) blur(14px);
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--primary) 95%, black) 0%, color-mix(in srgb, var(--primary) 65%, black) 100%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  transition: box-shadow 0.25s var(--ease);
 }
 
-.site-header.is-scrolled {
-  border-bottom-color: var(--border);
-  box-shadow: var(--shadow-sm);
+.site-topbar.is-scrolled {
+  box-shadow: var(--shadow-md);
 }
 
 .header-inner {
@@ -144,12 +142,12 @@ a:hover { text-decoration: underline; }
   font-family: var(--font-heading);
   font-weight: 700;
   font-size: 1.3rem;
-  color: var(--ink);
+  color: #fff;
   letter-spacing: -0.01em;
 }
 
 .brand-tagline {
-  color: var(--ink-faint);
+  color: rgba(255, 255, 255, 0.75);
   font-size: 0.82rem;
 }
 
@@ -160,8 +158,8 @@ a:hover { text-decoration: underline; }
   width: 42px;
   height: 42px;
   border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
   cursor: pointer;
   flex-direction: column;
   gap: 4px;
@@ -170,13 +168,13 @@ a:hover { text-decoration: underline; }
 .nav-toggle span {
   width: 18px;
   height: 2px;
-  background: var(--ink);
+  background: #fff;
   border-radius: 2px;
   transition: transform 0.2s var(--ease), opacity 0.2s var(--ease);
 }
 
 .site-nav {
-  border-bottom: 1px solid var(--border);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .nav-inner {
@@ -196,7 +194,7 @@ a:hover { text-decoration: underline; }
   position: relative;
   display: inline-block;
   padding: 0.85rem 0.9rem;
-  color: var(--ink-soft);
+  color: rgba(255, 255, 255, 0.8);
   font-weight: 500;
   font-size: 0.95rem;
 }
@@ -208,7 +206,7 @@ a:hover { text-decoration: underline; }
   right: 0.9rem;
   bottom: 0.55rem;
   height: 2px;
-  background: var(--primary);
+  background: #fff;
   border-radius: 2px;
   transform: scaleX(0);
   transform-origin: left;
@@ -217,7 +215,7 @@ a:hover { text-decoration: underline; }
 
 .site-nav a:hover,
 .site-nav a.active {
-  color: var(--ink);
+  color: #fff;
   text-decoration: none;
 }
 
@@ -356,24 +354,30 @@ a:hover { text-decoration: underline; }
 
 .media-panel .btn-primary {
   background: #fff;
-  color: var(--primary-strong);
+  color: var(--ink);
 }
 
 .media-panel .btn-primary:hover {
   background: rgba(255, 255, 255, 0.9);
-  color: var(--primary-strong);
+  color: var(--ink);
   transform: translateY(-2px);
 }
 
+/* Dunkle "Glas"-Füllung statt nur Rand: bleibt lesbar, egal wie hell die
+   Bildstelle darunter gerade ist. */
 .media-panel .btn-secondary {
-  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-color: rgba(255, 255, 255, 0.5);
   color: #fff;
 }
 
 .media-panel .btn-secondary:hover {
+  background: rgba(0, 0, 0, 0.4);
   border-color: #fff;
-  background: rgba(255, 255, 255, 0.14);
   color: #fff;
+  transform: translateY(-2px);
 }
 
 /* Karte, die aus einem media-panel darüber "herausragt" (z. B. Kontakt-Panel) */
@@ -421,6 +425,14 @@ a:hover { text-decoration: underline; }
   border-radius: var(--radius);
   padding: 2rem 1.75rem;
   transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+.card h3 {
+  color: var(--ink);
+}
+
+.card p {
+  color: var(--ink-soft);
 }
 
 .card:hover {
