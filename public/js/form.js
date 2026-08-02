@@ -272,7 +272,6 @@
       home: {
         headline: 'Willkommen bei Lumora Fotostudio',
         subheadline: 'Individuelle Fotografie für besondere Momente',
-        introText: 'Wir begleiten Hochzeiten, Portraits und Business-Shootings mit einem Auge fürs Detail und einem Gespür für echte Emotionen.',
         ctaText: 'Termin anfragen',
         ctaLink: 'kontakt.html',
       },
@@ -326,7 +325,6 @@
       home: {
         headline: 'Erreiche deine Ziele mit FitForm',
         subheadline: 'Personal Training, das zu deinem Leben passt',
-        introText: 'Ob Kraftaufbau, Abnehmen oder mehr Beweglichkeit – ich erstelle dir ein Trainingskonzept, das wirklich zu dir passt.',
         ctaText: 'Kostenloses Erstgespräch',
         ctaLink: 'kontakt.html',
       },
@@ -379,7 +377,6 @@
       home: {
         headline: 'Willkommen bei Bäckerei Sonnenkorn',
         subheadline: 'Handwerksbäckerei mit Herz und Tradition',
-        introText: 'Jeden Morgen backen wir Brot, Brötchen und Kuchen frisch nach eigenen Rezepten – aus regionalen Zutaten, ganz ohne Zusatzstoffe.',
         ctaText: 'Öffnungszeiten & Anfahrt',
         ctaLink: 'kontakt.html',
       },
@@ -434,7 +431,6 @@
       home: {
         headline: 'AutoService Wagner – Ihre Werkstatt in Köln',
         subheadline: 'Reparatur, Wartung und Reifenservice aus einer Hand',
-        introText: 'Von der Inspektion bis zur Unfallreparatur – unser Meisterteam kümmert sich zuverlässig um alle Marken.',
         ctaText: 'Termin vereinbaren',
         ctaLink: 'kontakt.html',
       },
@@ -511,7 +507,6 @@
 
     setValue('content.home.headline', SAMPLE_DATA.home.headline);
     setValue('content.home.subheadline', SAMPLE_DATA.home.subheadline);
-    setValue('content.home.introText', SAMPLE_DATA.home.introText);
     setValue('content.home.ctaText', SAMPLE_DATA.home.ctaText);
     setValue('content.home.ctaLink', SAMPLE_DATA.home.ctaLink);
 
