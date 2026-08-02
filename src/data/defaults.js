@@ -4,18 +4,18 @@ const VARIANT_DEFAULTS = {
   freelancer: {
     label: 'Freelancer',
     primaryColor: '#e8603c',
-    fontHeading: '"Fraunces", Georgia, serif',
+    fontHeading: '"Bricolage Grotesque", "Segoe UI", sans-serif',
     fontBody: '"Inter", "Segoe UI", sans-serif',
     radius: '18px',
-    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap',
+    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap',
   },
   unternehmen: {
     label: 'Kleines Unternehmen',
     primaryColor: '#4f46e5',
-    fontHeading: '"Sora", "Segoe UI", sans-serif',
+    fontHeading: '"Space Grotesk", "Segoe UI", sans-serif',
     fontBody: '"Inter", "Segoe UI", sans-serif',
     radius: '12px',
-    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap',
+    googleFontsUrl: 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap',
   },
 };
 

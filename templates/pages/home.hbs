@@ -1,23 +1,16 @@
-<section class="hero">
-  <div class="container hero-grid{{#if images.hero}} has-image{{/if}}">
-    <div class="hero-inner">
-      <span class="eyebrow">{{business.name}}</span>
-      <h1>{{content.home.headline}}</h1>
-      {{#if content.home.subheadline}}
-        <p class="hero-sub">{{content.home.subheadline}}</p>
-      {{/if}}
-      {{#if content.home.ctaText}}
-        <div class="btn-row">
-          <a class="btn btn-primary" href="{{content.home.ctaLink}}">{{content.home.ctaText}}</a>
-          {{#if pages.leistungen}}
-            <a class="btn btn-secondary" href="leistungen.html">Leistungen ansehen</a>
-          {{/if}}
-        </div>
-      {{/if}}
-    </div>
-    {{#if images.hero}}
-      <div class="hero-media reveal">
-        <img src="{{{images.hero.src}}}" alt="{{images.hero.alt}}" loading="eager">
+<section class="hero media-panel{{#if images.hero}} has-image{{/if}}"{{#if images.hero}} style="background-image:url('{{{images.hero.src}}}')"{{/if}}>
+  <div class="container hero-inner">
+    <span class="eyebrow">{{business.name}}</span>
+    <h1>{{content.home.headline}}</h1>
+    {{#if content.home.subheadline}}
+      <p class="hero-sub lede">{{content.home.subheadline}}</p>
+    {{/if}}
+    {{#if content.home.ctaText}}
+      <div class="btn-row">
+        <a class="btn btn-primary" href="{{content.home.ctaLink}}">{{content.home.ctaText}}</a>
+        {{#if pages.leistungen}}
+          <a class="btn btn-secondary" href="leistungen.html">Leistungen ansehen</a>
+        {{/if}}
       </div>
     {{/if}}
   </div>
