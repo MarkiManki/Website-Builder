@@ -18,14 +18,20 @@
   --ink: #15161a;
   --ink-soft: #5a5c66;
   --ink-faint: #8b8d97;
-  --surface: #ffffff;
-  --surface-muted: #f7f6f3;
+  --surface: #fbfaf7;
+  --surface-muted: #f2f0ea;
   --border: rgba(21, 22, 26, 0.09);
 
   --primary-soft: color-mix(in srgb, var(--primary) 10%, white);
   --primary-soft-strong: color-mix(in srgb, var(--primary) 20%, white);
   --primary-strong: color-mix(in srgb, var(--primary) 82%, black);
   --on-primary: white;
+
+  /* Text/Elemente auf farbigen Flächen (Header, media-panel): bewusst kein
+     reines Weiß, sondern ein leicht gebrochenes Off-White. */
+  --on-dark: rgba(255, 250, 245, 0.94);
+  --on-dark-soft: rgba(255, 250, 245, 0.72);
+  --on-dark-faint: rgba(255, 250, 245, 0.5);
 
   --container: 1180px;
   --gutter: 1.5rem;
@@ -134,21 +140,32 @@ a:hover { text-decoration: underline; }
 
 .brand {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
   line-height: 1.2;
 }
 
 .brand-text {
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 1.3rem;
-  color: #fff;
-  letter-spacing: -0.01em;
+  font-size: 1.4rem;
+  color: var(--on-dark);
+  letter-spacing: -0.015em;
+}
+
+.brand-divider {
+  width: 1px;
+  height: 1.2rem;
+  background: rgba(255, 250, 245, 0.3);
+  flex-shrink: 0;
 }
 
 .brand-tagline {
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 0.82rem;
+  color: var(--on-dark-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .nav-toggle {
@@ -158,8 +175,8 @@ a:hover { text-decoration: underline; }
   width: 42px;
   height: 42px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 250, 245, 0.35);
+  background: rgba(255, 250, 245, 0.1);
   cursor: pointer;
   flex-direction: column;
   gap: 4px;
@@ -168,13 +185,13 @@ a:hover { text-decoration: underline; }
 .nav-toggle span {
   width: 18px;
   height: 2px;
-  background: #fff;
+  background: var(--on-dark);
   border-radius: 2px;
   transition: transform 0.2s var(--ease), opacity 0.2s var(--ease);
 }
 
 .site-nav {
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  border-top: 1px solid rgba(255, 250, 245, 0.14);
 }
 
 .nav-inner {
@@ -185,43 +202,31 @@ a:hover { text-decoration: underline; }
   list-style: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.2rem;
+  gap: 0.4rem;
   margin: 0;
-  padding: 0 var(--gutter);
+  padding: 0.55rem var(--gutter) 0.8rem;
 }
 
 .site-nav a {
-  position: relative;
   display: inline-block;
-  padding: 0.85rem 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-  font-size: 0.95rem;
+  padding: 0.5rem 1.05rem;
+  border-radius: 999px;
+  color: var(--on-dark-soft);
+  font-weight: 600;
+  font-size: 0.96rem;
+  transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
 }
 
-.site-nav a::after {
-  content: "";
-  position: absolute;
-  left: 0.9rem;
-  right: 0.9rem;
-  bottom: 0.55rem;
-  height: 2px;
-  background: #fff;
-  border-radius: 2px;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.2s var(--ease);
-}
-
-.site-nav a:hover,
-.site-nav a.active {
-  color: #fff;
+.site-nav a:hover {
+  background: rgba(255, 250, 245, 0.14);
+  color: var(--on-dark);
   text-decoration: none;
 }
 
-.site-nav a:hover::after,
-.site-nav a.active::after {
-  transform: scaleX(1);
+.site-nav a.active {
+  background: rgba(255, 250, 245, 0.22);
+  color: var(--on-dark);
+  text-decoration: none;
 }
 
 /* ---------- Buttons ---------- */
@@ -311,7 +316,7 @@ a:hover { text-decoration: underline; }
 .media-panel {
   position: relative;
   padding: clamp(3.5rem, 7vw, 6.5rem) 0;
-  color: #fff;
+  color: var(--on-dark);
   overflow: hidden;
   background-size: cover;
   background-position: center;
@@ -325,8 +330,9 @@ a:hover { text-decoration: underline; }
   background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 92%, black) 0%, color-mix(in srgb, var(--primary) 58%, black) 100%);
 }
 
+/* Bei Fotos nur ein dezenter Farbschleier, damit das Bild noch erkennbar bleibt. */
 .media-panel.has-image::before {
-  opacity: 0.8;
+  opacity: 0.48;
 }
 
 .media-panel .container {
@@ -334,49 +340,61 @@ a:hover { text-decoration: underline; }
   z-index: 1;
 }
 
+.media-panel.has-image h1,
+.media-panel.has-image h2,
+.media-panel.has-image h3,
+.media-panel.has-image .eyebrow,
+.media-panel.has-image .lede {
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.38);
+}
+
 .media-panel h1,
 .media-panel h2,
 .media-panel h3 {
-  color: #fff;
+  color: var(--on-dark);
 }
 
 .media-panel .lede {
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--on-dark-soft);
 }
 
 .media-panel .eyebrow {
-  color: #fff;
+  color: var(--on-dark);
 }
 
 .media-panel .eyebrow::before {
-  background: #fff;
+  background: var(--on-dark);
 }
 
+/* Solider dunkler Button statt Weiß: passt zu jeder Akzentfarbe, kein
+   Weiß-Clash. */
 .media-panel .btn-primary {
-  background: #fff;
-  color: var(--ink);
+  background: var(--ink);
+  color: var(--on-dark);
+  box-shadow: var(--shadow-md);
 }
 
 .media-panel .btn-primary:hover {
-  background: rgba(255, 255, 255, 0.9);
-  color: var(--ink);
+  background: #000;
+  color: #fff;
   transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
-/* Dunkle "Glas"-Füllung statt nur Rand: bleibt lesbar, egal wie hell die
-   Bildstelle darunter gerade ist. */
+/* Dezente helle Glas-Füllung als zweite Stufe: bleibt lesbar, egal wie hell
+   die Bildstelle darunter gerade ist, ohne selbst reinweiß zu sein. */
 .media-panel .btn-secondary {
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(255, 250, 245, 0.14);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  border-color: rgba(255, 255, 255, 0.5);
-  color: #fff;
+  border-color: rgba(255, 250, 245, 0.45);
+  color: var(--on-dark);
 }
 
 .media-panel .btn-secondary:hover {
-  background: rgba(0, 0, 0, 0.4);
-  border-color: #fff;
-  color: #fff;
+  background: rgba(255, 250, 245, 0.24);
+  border-color: var(--on-dark);
+  color: var(--on-dark);
   transform: translateY(-2px);
 }
 
@@ -591,16 +609,16 @@ a:hover { text-decoration: underline; }
   .site-nav ul {
     display: none;
     flex-direction: column;
+    align-items: flex-start;
     padding: 0.5rem var(--gutter) 1rem;
-    gap: 0;
+    gap: 0.3rem;
   }
 
   .site-nav.is-open ul {
     display: flex;
   }
 
-  .site-nav a { padding: 0.7rem 0; }
-  .site-nav a::after { display: none; }
+  .site-nav a { padding: 0.6rem 1rem; }
 
   .contact-panel { padding: 1.75rem; }
   .contact-row { flex-direction: column; gap: 0.2rem; }
@@ -611,4 +629,11 @@ a:hover { text-decoration: underline; }
 @media (max-width: 600px) {
   .hero { text-align: left; }
   .btn-row { flex-direction: column; align-items: stretch; }
+}
+
+@media (max-width: 480px) {
+  .brand-divider,
+  .brand-tagline {
+    display: none;
+  }
 }
