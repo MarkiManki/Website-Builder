@@ -92,7 +92,7 @@ async function resolveImages(formData, type) {
   const label = profession ? profession.label : fallback.label;
 
   const queries = terms[1] && terms[1] !== terms[0] ? [terms[0], terms[1]] : [terms[0]];
-  const results = await Promise.all(queries.map((term) => getImages(term, 3)));
+  const results = await Promise.all(queries.map((term) => getImages(term, 4)));
   const pool = [].concat(...results);
 
   const withAlt = (image) => (image ? { src: image.src, alt: `${label} – Symbolbild` } : null);
@@ -101,6 +101,7 @@ async function resolveImages(formData, type) {
     hero: withAlt(pool[0]),
     about: withAlt(pool[1] || pool[0]),
     services: withAlt(pool[2] || pool[1] || pool[0]),
+    cta: withAlt(pool[3] || pool[0]),
   };
 }
 

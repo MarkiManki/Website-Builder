@@ -321,20 +321,6 @@ a:hover { text-decoration: underline; }
   box-shadow: var(--shadow-lg);
 }
 
-.section-banner {
-  margin-bottom: 2.5rem;
-  border-radius: calc(var(--radius) + 6px);
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-}
-
-.section-banner img {
-  width: 100%;
-  height: clamp(220px, 32vw, 360px);
-  object-fit: cover;
-  display: block;
-}
-
 .about-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -344,6 +330,78 @@ a:hover { text-decoration: underline; }
 
 .about-grid.has-image {
   grid-template-columns: 1fr 1fr;
+}
+
+/* ---------- Media-Panel: Bild/Farbverlauf als Hintergrund, Text/Buttons obenauf ---------- */
+.media-panel {
+  position: relative;
+  padding: clamp(3.5rem, 7vw, 6.5rem) 0;
+  color: #fff;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+}
+
+.media-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 92%, black) 0%, color-mix(in srgb, var(--primary) 58%, black) 100%);
+}
+
+.media-panel.has-image::before {
+  opacity: 0.8;
+}
+
+.media-panel .container {
+  position: relative;
+  z-index: 1;
+}
+
+.media-panel h1,
+.media-panel h2,
+.media-panel h3 {
+  color: #fff;
+}
+
+.media-panel .lede {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.media-panel .eyebrow {
+  color: #fff;
+}
+
+.media-panel .eyebrow::before {
+  background: #fff;
+}
+
+.media-panel .btn-primary {
+  background: #fff;
+  color: var(--primary-strong);
+}
+
+.media-panel .btn-primary:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--primary-strong);
+  transform: translateY(-2px);
+}
+
+.media-panel .btn-secondary {
+  border-color: rgba(255, 255, 255, 0.55);
+  color: #fff;
+}
+
+.media-panel .btn-secondary:hover {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+/* Karte, die aus einem media-panel darüber "herausragt" (z. B. Kontakt-Panel) */
+.contact-panel.lift {
+  margin-top: -4.5rem;
 }
 
 @media (max-width: 860px) {
@@ -485,6 +543,36 @@ a:hover { text-decoration: underline; }
   margin-top: 2rem;
 }
 
+/* ---------- Impressum / Rechtliches ---------- */
+.legal {
+  max-width: 680px;
+}
+
+.legal-block {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.legal-block:last-of-type {
+  border-bottom: none;
+}
+
+.legal-block h3 {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  margin-bottom: 0.6em;
+}
+
+.legal-block p {
+  color: var(--ink-soft);
+  margin-bottom: 0;
+}
+
 /* ---------- Scroll-Reveal ---------- */
 .reveal {
   opacity: 0;
@@ -533,6 +621,7 @@ a:hover { text-decoration: underline; }
   .contact-panel { padding: 1.75rem; }
   .contact-row { flex-direction: column; gap: 0.2rem; }
   .contact-row .label { min-width: 0; }
+  .contact-panel.lift { margin-top: -2.5rem; }
 }
 
 @media (max-width: 600px) {

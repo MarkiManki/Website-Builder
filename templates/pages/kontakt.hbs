@@ -1,14 +1,16 @@
+<section class="media-panel reveal{{#if images.hero}} has-image{{/if}}"{{#if images.hero}} style="background-image:url('{{{images.hero.src}}}')"{{/if}}>
+  <div class="container">
+    <span class="eyebrow">Kontakt</span>
+    <h1>{{content.kontakt.title}}</h1>
+    {{#if content.kontakt.intro}}
+      <p class="lede">{{content.kontakt.intro}}</p>
+    {{/if}}
+  </div>
+</section>
+
 <section class="section reveal">
   <div class="container">
-    <div class="section-head">
-      <span class="eyebrow">Kontakt</span>
-      <h1>{{content.kontakt.title}}</h1>
-      {{#if content.kontakt.intro}}
-        <p class="lede">{{content.kontakt.intro}}</p>
-      {{/if}}
-    </div>
-
-    <div class="contact-panel">
+    <div class="contact-panel lift">
       {{#if business.address}}
         <div class="contact-row">
           <span class="label">Adresse</span>

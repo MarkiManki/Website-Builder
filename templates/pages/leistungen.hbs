@@ -1,22 +1,15 @@
-<section class="section reveal">
+<section class="media-panel reveal{{#if images.services}} has-image{{/if}}"{{#if images.services}} style="background-image:url('{{{images.services.src}}}')"{{/if}}>
   <div class="container">
-    <div class="section-head">
-      <span class="eyebrow">Leistungen</span>
-      <h1>{{content.leistungen.title}}</h1>
-      {{#if content.leistungen.intro}}
-        <p class="lede">{{content.leistungen.intro}}</p>
-      {{/if}}
-    </div>
+    <span class="eyebrow">Leistungen</span>
+    <h1>{{content.leistungen.title}}</h1>
+    {{#if content.leistungen.intro}}
+      <p class="lede">{{content.leistungen.intro}}</p>
+    {{/if}}
   </div>
 </section>
 
 <section class="section section-muted reveal">
   <div class="container">
-    {{#if images.services}}
-      <div class="section-banner">
-        <img src="{{{images.services.src}}}" alt="{{images.services.alt}}" loading="lazy">
-      </div>
-    {{/if}}
     <div class="card-grid">
       {{#each content.leistungen.services}}
         <div class="card">
