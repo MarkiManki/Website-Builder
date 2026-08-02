@@ -13,7 +13,9 @@ function isConfigured() {
 }
 
 async function searchPexels(query, count) {
-  const url = `${PEXELS_SEARCH_URL}?query=${encodeURIComponent(query)}&per_page=${count}&orientation=landscape`;
+  // size=large verlangt Fotos mit mindestens ~24MP Originalauflösung, damit
+  // auch die großflächigen Hero-/Panel-Ausschnitte scharf bleiben.
+  const url = `${PEXELS_SEARCH_URL}?query=${encodeURIComponent(query)}&per_page=${count}&orientation=landscape&size=large`;
   const response = await fetch(url, {
     headers: { Authorization: process.env.PEXELS_API_KEY },
   });
@@ -34,7 +36,9 @@ async function getImages(query, count) {
 
   try {
     const photos = await searchPexels(query, count);
-    const images = photos.map((photo) => ({ src: photo.src.large }));
+    // large2x statt large: ca. 1880px breit statt 940px – bleibt auch bei
+    // bildschirmfüllenden Hero-/Panel-Ausschnitten auf großen Monitoren scharf.
+    const images = photos.map((photo) => ({ src: photo.src.large2x }));
     cache.set(cacheKey, images);
     return images;
   } catch (err) {

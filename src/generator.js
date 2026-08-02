@@ -8,6 +8,10 @@ const { getImages } = require('./images');
 const TEMPLATES_DIR = path.join(__dirname, '..', 'templates');
 const OUTPUT_DIR = path.join(__dirname, '..', 'output');
 
+// Zweistellige Nummerierung für Karten (01, 02, ...) statt eines zufällig
+// wirkenden Anfangsbuchstabens.
+Handlebars.registerHelper('indexNum', (index) => String(index + 1).padStart(2, '0'));
+
 function slugify(input) {
   return String(input || 'website')
     .toLowerCase()

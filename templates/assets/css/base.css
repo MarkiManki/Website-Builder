@@ -451,14 +451,18 @@ a:hover { text-decoration: underline; }
 }
 
 .card {
-  background: var(--surface);
+  background: color-mix(in srgb, var(--primary) 3%, var(--surface));
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 2rem 1.75rem;
+  padding: 2.1rem 1.85rem;
+  box-shadow: var(--shadow-sm);
   transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
 }
 
 .card h3 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1.15rem;
   color: var(--ink);
 }
 
@@ -469,9 +473,21 @@ a:hover { text-decoration: underline; }
 .card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
-  border-color: transparent;
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
 }
 
+/* Nummerierung für Leistungs-Karten (01, 02, ...) statt Anfangsbuchstabe. */
+.card-index {
+  display: block;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  color: var(--primary);
+  margin-bottom: 1.1rem;
+}
+
+/* Initialen-Kreis für Team-Karten. */
 .card-icon {
   width: 2.75rem;
   height: 2.75rem;

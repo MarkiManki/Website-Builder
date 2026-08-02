@@ -13,7 +13,7 @@
     <div class="card-grid">
       {{#each content.leistungen.services}}
         <div class="card">
-          <div class="card-icon">{{this.name.[0]}}</div>
+          <span class="card-index">{{indexNum @index}}</span>
           <h3>{{this.name}}</h3>
           <p>{{this.description}}</p>
         </div>
