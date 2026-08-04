@@ -6,11 +6,8 @@
       {{else}}
         <span class="brand-text">{{business.name}}</span>
       {{/if}}
-      {{#if business.tagline}}
-        <span class="brand-divider"></span>
-        <span class="brand-tagline">{{business.tagline}}</span>
-      {{/if}}
     </a>
+    {{> nav}}
     <button type="button" class="nav-toggle" aria-label="Menü öffnen" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>

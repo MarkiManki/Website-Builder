@@ -41,6 +41,11 @@
   --shadow-lg: 0 24px 48px -12px rgba(21, 22, 26, 0.22);
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Fallback, bevor site.js die tatsächliche Höhe der Topbar misst (siehe
+     setTopbarHeightVar) – verhindert, dass der Hero beim allerersten Paint
+     kurz falsch hoch ist. */
+  --topbar-height: 78px;
 }
 
 html {
@@ -49,6 +54,13 @@ html {
 
 body {
   margin: 0;
+  /* Die Topbar ist jetzt position:fixed (siehe .site-topbar) und daher aus
+     dem normalen Layoutfluss raus – dieser Abstand reserviert exakt ihren
+     Platz. Bewusst der EINE, konstante (ungescrollte) Messwert: würde er mit
+     der Topbar mitschrumpfen, würde die Hero-Höhe (100vh - Topbar) nicht
+     mehr zur tatsächlichen Seite passen und die nächste Sektion würde beim
+     Scrollen kurz durchscheinen. */
+  padding-top: var(--topbar-height);
   font-family: var(--font-body);
   color: var(--ink);
   background: var(--surface);
@@ -116,17 +128,31 @@ a:hover { text-decoration: underline; }
 }
 
 /* ---------- Header & Navigation ---------- */
-/* Header + Nav bilden zusammen EINE farbige Leiste (kein weißer Hintergrund). */
+/* Header und Nav sind EINE Zeile (kein zweiter Streifen darunter). Bewusst
+   position:fixed statt sticky: die Leiste darf beim Scrollen schrumpfen,
+   ohne dass sich dadurch der Dokumentfluss verschiebt (body übernimmt den
+   Platz via padding-top: var(--topbar-height), siehe oben). Sonst würde ein
+   schrumpfender Header die Hero-Höhenrechnung (100vh - Topbar) live
+   unterlaufen und die nächste Sektion würde beim Scrollen durchscheinen. */
 .site-topbar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 40;
   background: linear-gradient(120deg, color-mix(in srgb, var(--primary) 95%, black) 0%, color-mix(in srgb, var(--primary) 65%, black) 100%);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
-  transition: box-shadow 0.25s var(--ease);
+  transition: background 0.35s var(--ease), box-shadow 0.25s var(--ease), backdrop-filter 0.35s var(--ease);
 }
 
+/* Beim Scrollen: kleiner UND leicht transparent (Glass-Effekt), aber
+   derselbe Farbton – kein Hue-Wechsel, nur reduzierte Deckkraft + Weichzeichner. */
 .site-topbar.is-scrolled {
+  background: linear-gradient(120deg,
+    color-mix(in srgb, color-mix(in srgb, var(--primary) 95%, black) 88%, transparent) 0%,
+    color-mix(in srgb, color-mix(in srgb, var(--primary) 65%, black) 88%, transparent) 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   box-shadow: var(--shadow-md);
 }
 
@@ -134,8 +160,14 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1.25rem;
   padding: 1.1rem var(--gutter);
+  transition: padding 0.35s var(--ease);
+}
+
+/* Beim Scrollen wird die Leiste spürbar kompakter. */
+.site-topbar.is-scrolled .header-inner {
+  padding: 0.5rem var(--gutter);
 }
 
 .brand {
@@ -143,6 +175,7 @@ a:hover { text-decoration: underline; }
   align-items: center;
   gap: 0.85rem;
   line-height: 1.2;
+  flex-shrink: 0;
 }
 
 .brand-text {
@@ -151,60 +184,28 @@ a:hover { text-decoration: underline; }
   font-size: 1.4rem;
   color: var(--on-dark);
   letter-spacing: -0.015em;
+  transition: font-size 0.35s var(--ease);
 }
 
-.brand-divider {
-  width: 1px;
-  height: 1.2rem;
-  background: rgba(255, 250, 245, 0.3);
-  flex-shrink: 0;
+.site-topbar.is-scrolled .brand-text {
+  font-size: 1.05rem;
 }
 
-.brand-tagline {
-  color: var(--on-dark-soft);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.nav-toggle {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 250, 245, 0.35);
-  background: rgba(255, 250, 245, 0.1);
-  cursor: pointer;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.nav-toggle span {
-  width: 18px;
-  height: 2px;
-  background: var(--on-dark);
-  border-radius: 2px;
-  transition: transform 0.2s var(--ease), opacity 0.2s var(--ease);
-}
-
+/* ---------- Nav-Tabs (inline in der Leiste) ---------- */
 .site-nav {
-  border-top: 1px solid rgba(255, 250, 245, 0.14);
-}
-
-.nav-inner {
+  flex: 1;
   display: flex;
+  justify-content: flex-end;
 }
 
 .site-nav ul {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 0.4rem;
   margin: 0;
-  padding: 0.55rem var(--gutter) 0.8rem;
+  padding: 0;
 }
 
 .site-nav a {
@@ -227,6 +228,69 @@ a:hover { text-decoration: underline; }
   background: rgba(255, 250, 245, 0.22);
   color: var(--on-dark);
   text-decoration: none;
+}
+
+/* ---------- Hamburger-Umschalter ---------- */
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin-right: -0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 250, 245, 0.35);
+  background: rgba(255, 250, 245, 0.1);
+  cursor: pointer;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+  transition: width 0.35s var(--ease), height 0.35s var(--ease);
+}
+
+.site-topbar.is-scrolled .nav-toggle {
+  width: 36px;
+  height: 36px;
+}
+
+.nav-toggle span {
+  width: 18px;
+  height: 2px;
+  background: var(--on-dark);
+  border-radius: 2px;
+  transition: transform 0.2s var(--ease), opacity 0.2s var(--ease);
+}
+
+/* Kollabierter Zustand: greift beim Scrollen (.is-scrolled) UND auf schmalen
+   Viewports – site.js setzt in beiden Fällen dieselbe .nav-collapsed-Klasse.
+   Tabs verschwinden, Hamburger erscheint, Klick öffnet ein Dropdown. */
+.site-topbar.nav-collapsed .nav-toggle {
+  display: inline-flex;
+}
+
+.site-topbar.nav-collapsed .site-nav ul {
+  display: none;
+}
+
+.site-topbar.nav-collapsed .site-nav.is-open ul {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: absolute;
+  top: 100%;
+  right: var(--gutter);
+  min-width: 220px;
+  background: color-mix(in srgb, var(--primary) 88%, black 12%);
+  border-radius: calc(var(--radius) + 4px);
+  padding: 0.5rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.site-topbar.nav-collapsed .site-nav.is-open a {
+  display: block;
+  width: 100%;
+  border-radius: var(--radius);
+  text-align: left;
 }
 
 /* ---------- Buttons ---------- */
@@ -281,7 +345,10 @@ a:hover { text-decoration: underline; }
 /* Nimmt (fast) die komplette erste Bildschirmansicht ein; Inhalt sitzt
    unten, damit möglichst viel vom Bild sichtbar bleibt. */
 .hero.media-panel {
-  min-height: calc(100vh - 110px);
+  /* --topbar-height wird von site.js exakt gemessen (setTopbarHeightVar),
+     damit der Hero wirklich bildschirmfüllend ist – kein Reststreifen der
+     nächsten Sektion, egal wie lang Name/Tabs sind oder wie sie umbrechen. */
+  min-height: calc(100vh - var(--topbar-height));
   display: flex;
   align-items: flex-end;
   padding: 0 0 clamp(3rem, 7vw, 5.5rem);
@@ -359,6 +426,20 @@ a:hover { text-decoration: underline; }
 .media-panel.has-image .eyebrow,
 .media-panel.has-image .lede {
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.38);
+}
+
+/* Zusätzliche "Glas"-Box hinter dem Text auf Foto-Panels: garantiert Lesbarkeit
+   unabhängig davon, wie hell/kontrastarm die jeweilige Bildstelle vom
+   Pexels-Zufallsfoto ausfällt (kein Text mehr "weiß auf weiß"). Ohne Foto
+   sorgt bereits der Farbverlauf (siehe ::before) für genug Kontrast, daher
+   nur bei .has-image aktiv. */
+.media-panel.has-image .media-copy {
+  display: inline-block;
+  background: rgba(10, 10, 12, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 1.6rem 1.9rem;
+  border-radius: calc(var(--radius) + 8px);
 }
 
 .media-panel h1,
@@ -460,9 +541,9 @@ a:hover { text-decoration: underline; }
 }
 
 .card h3 {
-  font-family: var(--font-body);
+  font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   color: var(--ink);
 }
 
@@ -476,15 +557,19 @@ a:hover { text-decoration: underline; }
   border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
 }
 
-/* Nummerierung für Leistungs-Karten (01, 02, ...) statt Anfangsbuchstabe. */
-.card-index {
-  display: block;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 0.9rem;
-  letter-spacing: 0.04em;
-  color: var(--primary);
-  margin-bottom: 1.1rem;
+/* Leistungs-Karte mit Foto: Bild bricht bis an den Kartenrand aus. */
+.card-media {
+  position: relative;
+  margin: -2.1rem -1.85rem 1.6rem;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Initialen-Kreis für Team-Karten. */
@@ -502,6 +587,19 @@ a:hover { text-decoration: underline; }
   margin-bottom: 1.1rem;
 }
 
+/* Team-Mitglied mit ausgewähltem Foto statt Initialen-Kreis. */
+.card-icon-photo {
+  overflow: hidden;
+  padding: 0;
+}
+
+.card-icon-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
 .card-role {
   color: var(--primary);
   font-weight: 600;
@@ -513,6 +611,17 @@ a:hover { text-decoration: underline; }
 .card p:last-child { margin-bottom: 0; }
 
 /* ---------- Kontakt ---------- */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  align-items: stretch;
+}
+
+.contact-grid.has-map {
+  grid-template-columns: minmax(0, 560px) 1fr;
+}
+
 .contact-panel {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -520,6 +629,29 @@ a:hover { text-decoration: underline; }
   padding: 2.5rem;
   box-shadow: var(--shadow-md);
   max-width: 560px;
+}
+
+/* Karte, die Google Maps ohne API-Key einbettet (öffentliches /output=embed,
+   funktioniert ohne Setup-Aufwand für den Kunden). Kein festes Seitenverhältnis
+   mehr: dank align-items:stretch übernimmt sie automatisch dieselbe Höhe wie
+   die Kontakt-Box daneben, egal wie viele Zeilen die Kontakt-Box hat. */
+.map-embed {
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 4px);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  min-height: 320px;
+}
+
+.contact-grid.has-map .map-embed {
+  margin-top: -4.5rem;
+}
+
+.map-embed iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
 }
 
 .contact-row {
@@ -628,45 +760,16 @@ a:hover { text-decoration: underline; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 860px) {
-  .nav-toggle { display: inline-flex; }
-
-  .hero.media-panel {
-    min-height: calc(100vh - 76px);
-  }
-
-  .site-nav .nav-inner {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .site-nav ul {
-    display: none;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0.5rem var(--gutter) 1rem;
-    gap: 0.3rem;
-  }
-
-  .site-nav.is-open ul {
-    display: flex;
-  }
-
-  .site-nav a { padding: 0.6rem 1rem; }
-
   .contact-panel { padding: 1.75rem; }
   .contact-row { flex-direction: column; gap: 0.2rem; }
   .contact-row .label { min-width: 0; }
   .contact-panel.lift { margin-top: -2.5rem; }
+
+  .contact-grid.has-map { grid-template-columns: 1fr; }
+  .contact-grid.has-map .map-embed { margin-top: 1rem; }
 }
 
 @media (max-width: 600px) {
   .hero { text-align: left; }
   .btn-row { flex-direction: column; align-items: stretch; }
-}
-
-@media (max-width: 480px) {
-  .brand-divider,
-  .brand-tagline {
-    display: none;
-  }
 }

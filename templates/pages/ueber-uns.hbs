@@ -27,7 +27,11 @@
     <div class="card-grid">
       {{#each content.ueberUns.teamMembers}}
         <div class="card">
-          <div class="card-icon">{{this.name.[0]}}</div>
+          {{#if this.photo}}
+            <div class="card-icon card-icon-photo"><img src="{{{this.photo}}}" alt="{{this.name}}" loading="lazy"></div>
+          {{else}}
+            <div class="card-icon">{{this.name.[0]}}</div>
+          {{/if}}
           <h3>{{this.name}}</h3>
           {{#if this.role}}<p class="card-role">{{this.role}}</p>{{/if}}
           {{#if this.text}}<p>{{this.text}}</p>{{/if}}

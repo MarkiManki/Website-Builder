@@ -9,13 +9,16 @@
   let currentPreviewPage = 'home';
   let previewTimer = null;
 
-  // Vorschlagsfarbe je Kundentyp (muss zu den Defaults in src/data/defaults.js passen).
+  // Vorschlagsfarbe/-schrift je Kundentyp (muss zu den Defaults in src/data/defaults.js passen).
   const VARIANT_PRIMARY_COLOR = { freelancer: '#e8603c', unternehmen: '#4f46e5' };
+  const VARIANT_DEFAULT_FONT = { freelancer: 'space-grotesk', unternehmen: 'sora' };
   document.querySelectorAll('input[name="type"]').forEach((radio) => {
     radio.addEventListener('change', () => {
       if (!radio.checked) return;
       const colorInput = form.elements['design.primaryColor'];
       if (colorInput) colorInput.value = VARIANT_PRIMARY_COLOR[radio.value];
+      const fontSelect = form.elements['design.fontKey'];
+      if (fontSelect) fontSelect.value = VARIANT_DEFAULT_FONT[radio.value];
     });
   });
 
@@ -73,6 +76,169 @@
     });
   });
 
+  // --- Bild-Picker: Pexels-Vorschläge (mit "weitere laden") ODER eigenes
+  // Hochgeladenes Bild, direkt im Builder auswählbar (statt automatischer
+  // Zufallsauswahl). Wird sowohl für die festen Seiten-Bilder als auch für
+  // Team-Mitglieder-Fotos verwendet. ---
+  const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+
+  function initImagePicker(root) {
+    const queryInput = root.querySelector('.image-picker-query');
+    const searchBtn = root.querySelector('.image-picker-search');
+    const moreBtn = root.querySelector('.image-picker-more');
+    const grid = root.querySelector('.image-picker-grid');
+    const valueInput = root.querySelector('.image-picker-value');
+    const fileInput = root.querySelector('.image-picker-file');
+    const orientation = root.dataset.orientation || 'landscape';
+    if (!queryInput || !searchBtn || !grid || !valueInput) return;
+
+    let page = 1;
+    let lastQuery = '';
+
+    let uploadPreview = null;
+
+    function clearSelection() {
+      grid.querySelectorAll('.image-picker-thumb').forEach((el) => el.classList.remove('selected'));
+      if (uploadPreview) {
+        uploadPreview.remove();
+        uploadPreview = null;
+      }
+    }
+
+    function showUploadPreview(dataUrl) {
+      clearSelection();
+      uploadPreview = document.createElement('div');
+      uploadPreview.className = 'image-picker-upload-preview';
+      const img = document.createElement('img');
+      img.src = dataUrl;
+      img.alt = '';
+      const clearBtn = document.createElement('button');
+      clearBtn.type = 'button';
+      clearBtn.textContent = '✕ Eigenes Bild entfernen';
+      clearBtn.addEventListener('click', () => {
+        clearSelection();
+        if (fileInput) fileInput.value = '';
+        selectValue('');
+      });
+      uploadPreview.appendChild(img);
+      uploadPreview.appendChild(clearBtn);
+      root.insertBefore(uploadPreview, valueInput);
+    }
+
+    function selectValue(fullUrl) {
+      valueInput.value = fullUrl;
+      valueInput.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    function selectThumb(thumbEl, fullUrl) {
+      clearSelection();
+      thumbEl.classList.add('selected');
+      selectValue(fullUrl);
+    }
+
+    function appendMessage(text) {
+      const msg = document.createElement('p');
+      msg.className = 'image-picker-empty';
+      msg.textContent = text;
+      grid.appendChild(msg);
+    }
+
+    function appendThumbs(results) {
+      grid.querySelectorAll('.image-picker-empty').forEach((el) => el.remove());
+      results.forEach((photo) => {
+        const thumb = document.createElement('button');
+        thumb.type = 'button';
+        thumb.className = 'image-picker-thumb';
+        if (valueInput.value === photo.full) thumb.classList.add('selected');
+        const img = document.createElement('img');
+        img.src = photo.thumb;
+        img.loading = 'lazy';
+        img.alt = '';
+        thumb.appendChild(img);
+        thumb.addEventListener('click', () => selectThumb(thumb, photo.full));
+        grid.appendChild(thumb);
+      });
+    }
+
+    async function loadPage(query, requestedPage) {
+      try {
+        const response = await fetch(`/images/search?query=${encodeURIComponent(query)}&orientation=${orientation}&page=${requestedPage}`);
+        const data = await response.json();
+        if (!data.imagesEnabled) {
+          if (moreBtn) moreBtn.hidden = true;
+          appendMessage('Kein Pexels-API-Key eingerichtet (siehe README).');
+          return;
+        }
+        if (!data.results || !data.results.length) {
+          if (moreBtn) moreBtn.hidden = true;
+          if (requestedPage === 1) appendMessage('Keine Ergebnisse gefunden – anderen Suchbegriff versuchen.');
+          return;
+        }
+        appendThumbs(data.results);
+        if (moreBtn) moreBtn.hidden = data.results.length < 10;
+      } catch (err) {
+        appendMessage('Bildersuche fehlgeschlagen.');
+      }
+    }
+
+    function runSearch() {
+      const query = queryInput.value.trim();
+      if (!query) {
+        grid.innerHTML = '';
+        if (moreBtn) moreBtn.hidden = true;
+        appendMessage('Suchbegriff eingeben und "Bilder laden" klicken.');
+        return;
+      }
+      lastQuery = query;
+      page = 1;
+      grid.innerHTML = '';
+      appendMessage('Lade Bilder…');
+      loadPage(query, page).then(() => {
+        grid.querySelectorAll('.image-picker-empty').forEach((el) => {
+          if (el.textContent === 'Lade Bilder…') el.remove();
+        });
+      });
+    }
+
+    function loadMore() {
+      if (!lastQuery) return;
+      page += 1;
+      loadPage(lastQuery, page);
+    }
+
+    searchBtn.addEventListener('click', runSearch);
+    queryInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        runSearch();
+      }
+    });
+    if (moreBtn) moreBtn.addEventListener('click', loadMore);
+
+    // --- Eigenes Bild hochladen: als Data-URI direkt eingebettet, kein
+    // Server-Upload/Storage nötig – funktioniert genauso in Vorschau & Export. ---
+    if (fileInput) {
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        if (file.size > MAX_UPLOAD_BYTES) {
+          window.alert('Bild ist zu groß (max. 5 MB). Bitte kleineres Bild wählen.');
+          fileInput.value = '';
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = String(reader.result);
+          showUploadPreview(dataUrl);
+          selectValue(dataUrl);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  }
+
+  document.querySelectorAll('.image-picker').forEach(initImagePicker);
+
   // --- Dynamische Zeilen (Team-Mitglieder, Leistungen) ---
   function addRepeatRow(containerId, templateId, values) {
     const container = document.getElementById(containerId);
@@ -82,6 +248,7 @@
       row.remove();
       schedulePreviewUpdate();
     });
+    row.querySelectorAll('.image-picker').forEach(initImagePicker);
     if (values) {
       Object.keys(values).forEach((field) => {
         const input = row.querySelector(`[data-field="${field}"]`);
@@ -145,7 +312,7 @@
 
     data.content = data.content || {};
     data.content.ueberUns = data.content.ueberUns || {};
-    data.content.ueberUns.teamMembers = collectRepeatRows('team-members', ['name', 'role', 'text']);
+    data.content.ueberUns.teamMembers = collectRepeatRows('team-members', ['name', 'role', 'text', 'photo']);
 
     data.content.leistungen = data.content.leistungen || {};
     data.content.leistungen.services = collectRepeatRows('services', ['name', 'description']);

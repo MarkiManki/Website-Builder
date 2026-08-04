@@ -1,9 +1,7 @@
 <nav class="site-nav">
-  <div class="container nav-inner">
-    <ul>
-      {{#each navLinks}}
-        <li><a href="{{this.href}}" {{#if this.active}}class="active" aria-current="page"{{/if}}>{{this.label}}</a></li>
-      {{/each}}
-    </ul>
-  </div>
+  <ul>
+    {{#each navLinks}}
+      <li><a href="{{this.href}}" {{#if this.active}}class="active" aria-current="page"{{/if}}>{{this.label}}</a></li>
+    {{/each}}
+  </ul>
 </nav>

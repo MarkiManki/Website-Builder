@@ -1,16 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 const Handlebars = require('handlebars');
-const { VARIANT_DEFAULTS, PAGE_DEFINITIONS } = require('./data/defaults');
+const { VARIANT_DEFAULTS, FONT_PRESETS, PAGE_DEFINITIONS } = require('./data/defaults');
 const { PROFESSIONS, GENERIC_FALLBACK } = require('./data/professions');
 const { getImages } = require('./images');
 
 const TEMPLATES_DIR = path.join(__dirname, '..', 'templates');
 const OUTPUT_DIR = path.join(__dirname, '..', 'output');
-
-// Zweistellige Nummerierung für Karten (01, 02, ...) statt eines zufällig
-// wirkenden Anfangsbuchstabens.
-Handlebars.registerHelper('indexNum', (index) => String(index + 1).padStart(2, '0'));
 
 function slugify(input) {
   return String(input || 'website')
@@ -56,6 +52,7 @@ function buildContext(formData) {
   const enabledPages = buildEnabledPages(selectedPages);
 
   const navLinks = enabledPages.map((page) => ({
+    key: page.key,
     href: page.file,
     label: page.label.split(' / ')[0].split(' (')[0],
   }));
@@ -64,14 +61,19 @@ function buildContext(formData) {
     .filter((page) => page.key === 'impressum' || page.key === 'kontakt')
     .map((page) => ({ href: page.file, label: page.label.split(' / ')[0].split(' (')[0] }));
 
+  const requestedFontKey = formData.design && formData.design.fontKey;
+  const fontPreset = FONT_PRESETS.find((f) => f.key === requestedFontKey)
+    || FONT_PRESETS.find((f) => f.key === variantDefaults.defaultFontKey)
+    || FONT_PRESETS[0];
+
   return {
     type,
     design: {
       primaryColor: (formData.design && formData.design.primaryColor) || variantDefaults.primaryColor,
       radius: variantDefaults.radius,
-      fontHeading: variantDefaults.fontHeading,
-      fontBody: variantDefaults.fontBody,
-      googleFontsUrl: variantDefaults.googleFontsUrl,
+      fontHeading: fontPreset.fontHeading,
+      fontBody: fontPreset.fontBody,
+      googleFontsUrl: fontPreset.googleFontsUrl,
     },
     business,
     content,
@@ -96,17 +98,41 @@ async function resolveImages(formData, type) {
   const label = profession ? profession.label : fallback.label;
 
   const queries = terms[1] && terms[1] !== terms[0] ? [terms[0], terms[1]] : [terms[0]];
-  const results = await Promise.all(queries.map((term) => getImages(term, 4)));
+
+  // 4 feste Plätze (Hero/Über-uns/Leistungen-Panel/CTA) + optional ein Bild
+  // pro einzelner Leistung für die Leistungs-Karten. Freitext-Leistungsnamen
+  // eignen sich nicht als eigene Pexels-Suche (meist Deutsch), daher wird
+  // hier stattdessen aus dem ohnehin branchenpassenden Such-Pool bedient.
+  const services = (formData.content && formData.content.leistungen && formData.content.leistungen.services) || [];
+  const perQueryCount = Math.max(4, Math.ceil((4 + services.length) / queries.length));
+
+  const results = await Promise.all(queries.map((term) => getImages(term, perQueryCount)));
   const pool = [].concat(...results);
 
   const withAlt = (image) => (image ? { src: image.src, alt: `${label} – Symbolbild` } : null);
 
+  // Im Builder manuell ausgewählte Bilder (Bild-Picker) haben Vorrang vor der
+  // automatischen Pool-Auswahl. Ohne Auswahl bleibt das bisherige Verhalten.
+  const chosen = (formData.design && formData.design.images) || {};
+  const pick = (key, fallbackImage) => (chosen[key] ? { src: chosen[key], alt: `${label} – Symbolbild` } : fallbackImage);
+
   return {
-    hero: withAlt(pool[0]),
-    about: withAlt(pool[1] || pool[0]),
-    services: withAlt(pool[2] || pool[1] || pool[0]),
-    cta: withAlt(pool[3] || pool[0]),
+    hero: pick('hero', withAlt(pool[0])),
+    about: pick('about', withAlt(pool[1] || pool[0])),
+    services: pick('services', withAlt(pool[2] || pool[1] || pool[0])),
+    cta: pick('cta', withAlt(pool[3] || pool[0])),
+    serviceImages: services.map((_, i) => withAlt(pool[4 + i])),
   };
+}
+
+// Hängt das per Index zugeordnete Bild direkt an jede Leistung an, damit die
+// Templates die Karten mit einem simplen {{#each}}/{{#if this.image}} rendern
+// können (kein Index-Lookup über verschachtelte Block-Helper nötig).
+function attachServiceImages(context) {
+  const leistungen = context.content && context.content.leistungen;
+  if (!leistungen || !leistungen.services) return;
+  const serviceImages = (context.images && context.images.serviceImages) || [];
+  leistungen.services = leistungen.services.map((service, i) => ({ ...service, image: serviceImages[i] || null }));
 }
 
 function renderPage(pageKey, context, options = {}) {
@@ -120,9 +146,13 @@ function renderPage(pageKey, context, options = {}) {
   const seoTitleBase = context.business.name || 'Website';
   const pageDef = PAGE_DEFINITIONS.find((p) => p.key === pageKey);
   const seoTitle = pageKey === 'home' ? seoTitleBase : `${pageDef.label.split(' / ')[0]} · ${seoTitleBase}`;
+  // Aktive Seite in der Navigation markieren (pro Seite neu berechnet, da der
+  // Context ansonsten für alle Seiten identisch ist).
+  const navLinks = context.navLinks.map((link) => ({ ...link, active: link.key === pageKey }));
 
   return Handlebars.compile(layoutSource)({
     ...context,
+    navLinks,
     body: pageHtml,
     assetPrefix: '',
     seoTitle,
@@ -141,6 +171,7 @@ async function renderPreview(formData) {
   registerPartials();
   const context = buildContext(formData);
   context.images = await resolveImages(formData, context.type);
+  attachServiceImages(context);
 
   const pages = {};
   const pageKeyByFile = {};
@@ -164,6 +195,7 @@ async function generateSite(formData) {
   registerPartials();
   const context = buildContext(formData);
   context.images = await resolveImages(formData, context.type);
+  attachServiceImages(context);
 
   const slug = `${slugify(formData.business && formData.business.name)}-${Date.now()}`;
   const siteDir = path.join(OUTPUT_DIR, slug);

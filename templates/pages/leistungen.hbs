@@ -1,10 +1,12 @@
 <section class="media-panel reveal{{#if images.services}} has-image{{/if}}"{{#if images.services}} style="background-image:url('{{{images.services.src}}}')"{{/if}}>
   <div class="container">
-    <span class="eyebrow">Leistungen</span>
-    <h1>{{content.leistungen.title}}</h1>
-    {{#if content.leistungen.intro}}
-      <p class="lede">{{content.leistungen.intro}}</p>
-    {{/if}}
+    <div class="media-copy">
+      <span class="eyebrow">Leistungen</span>
+      <h1>{{content.leistungen.title}}</h1>
+      {{#if content.leistungen.intro}}
+        <p class="lede">{{content.leistungen.intro}}</p>
+      {{/if}}
+    </div>
   </div>
 </section>
 
@@ -12,8 +14,12 @@
   <div class="container">
     <div class="card-grid">
       {{#each content.leistungen.services}}
-        <div class="card">
-          <span class="card-index">{{indexNum @index}}</span>
+        <div class="card service-card">
+          {{#if this.image}}
+            <div class="card-media">
+              <img src="{{{this.image.src}}}" alt="{{this.image.alt}}" loading="lazy">
+            </div>
+          {{/if}}
           <h3>{{this.name}}</h3>
           <p>{{this.description}}</p>
         </div>

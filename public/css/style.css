@@ -328,6 +328,153 @@ textarea { resize: vertical; }
   font-size: 0.9rem;
 }
 
+/* Team-Mitglied-Zeile hat zusätzlich einen Bild-Picker, der über die volle
+   Zeilenbreite geht statt in die 3-Spalten-Grid zu passen. */
+.repeat-row-team {
+  align-items: start;
+}
+
+.repeat-row-team .image-picker {
+  grid-column: 1 / -1;
+}
+
+/* --- Bild-Picker: Suchbegriff eingeben, 10 Pexels-Vorschläge auswählen --- */
+.image-picker {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #e3e5ea;
+}
+
+.image-picker-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.image-picker-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.image-picker-controls input[type="text"] {
+  flex: 1;
+  min-width: 0;
+}
+
+.image-picker-search {
+  background: #eef1f6;
+  color: #1f2430;
+  border: 1px solid #d3d6dc;
+  border-radius: 6px;
+  padding: 0.55rem 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.image-picker-search:hover {
+  background: #e3e7ee;
+}
+
+.image-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 0.5rem;
+}
+
+.image-picker-thumb {
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  background: none;
+  aspect-ratio: 1 / 1;
+  line-height: 0;
+}
+
+.image-picker-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.image-picker-thumb.selected {
+  border-color: #ff6b4a;
+  box-shadow: 0 0 0 2px rgba(255, 107, 74, 0.25);
+}
+
+.image-picker-empty {
+  grid-column: 1 / -1;
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.image-picker-more {
+  display: block;
+  margin: 0.6rem 0 0;
+  background: none;
+  border: 1px dashed #b7bdc9;
+  border-radius: 6px;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1f2430;
+  cursor: pointer;
+  width: 100%;
+}
+
+.image-picker-more:hover {
+  background: #eef1f6;
+}
+
+.image-picker-upload {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.image-picker-upload input[type="file"] {
+  font-size: 0.8rem;
+  max-width: 100%;
+}
+
+.image-picker-upload-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+  padding: 0.5rem;
+  background: #f7f8fa;
+  border: 1px solid #e3e5ea;
+  border-radius: 6px;
+}
+
+.image-picker-upload-preview img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.image-picker-upload-preview button {
+  background: none;
+  border: none;
+  color: #b91c1c;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: left;
+}
+
 /* Submit */
 .submit-row {
   display: flex;

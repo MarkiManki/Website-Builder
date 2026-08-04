@@ -1,18 +1,20 @@
 <section class="hero media-panel{{#if images.hero}} has-image{{/if}}"{{#if images.hero}} style="background-image:url('{{{images.hero.src}}}')"{{/if}}>
   <div class="container hero-inner">
-    <span class="eyebrow">{{business.name}}</span>
-    <h1>{{content.home.headline}}</h1>
-    {{#if content.home.subheadline}}
-      <p class="hero-sub lede">{{content.home.subheadline}}</p>
-    {{/if}}
-    {{#if content.home.ctaText}}
-      <div class="btn-row">
-        <a class="btn btn-primary" href="{{content.home.ctaLink}}">{{content.home.ctaText}}</a>
-        {{#if pages.leistungen}}
-          <a class="btn btn-secondary" href="leistungen.html">Leistungen ansehen</a>
-        {{/if}}
-      </div>
-    {{/if}}
+    <div class="media-copy">
+      <span class="eyebrow">{{business.name}}</span>
+      <h1>{{content.home.headline}}</h1>
+      {{#if content.home.subheadline}}
+        <p class="hero-sub lede">{{content.home.subheadline}}</p>
+      {{/if}}
+      {{#if content.home.ctaText}}
+        <div class="btn-row">
+          <a class="btn btn-primary" href="{{content.home.ctaLink}}">{{content.home.ctaText}}</a>
+          {{#if pages.leistungen}}
+            <a class="btn btn-secondary" href="leistungen.html">Leistungen ansehen</a>
+          {{/if}}
+        </div>
+      {{/if}}
+    </div>
   </div>
 </section>
 
@@ -25,8 +27,12 @@
     </div>
     <div class="card-grid">
       {{#each content.leistungen.services}}
-        <div class="card">
-          <span class="card-index">{{indexNum @index}}</span>
+        <div class="card service-card">
+          {{#if this.image}}
+            <div class="card-media">
+              <img src="{{{this.image.src}}}" alt="{{this.image.alt}}" loading="lazy">
+            </div>
+          {{/if}}
           <h3>{{this.name}}</h3>
           <p>{{this.description}}</p>
         </div>
@@ -42,10 +48,12 @@
 {{#if pages.kontakt}}
 <section class="media-panel reveal{{#if images.cta}} has-image{{/if}}"{{#if images.cta}} style="background-image:url('{{{images.cta.src}}}')"{{/if}}>
   <div class="container center">
-    <span class="eyebrow">Kontakt</span>
-    <h2>Interesse geweckt?</h2>
-    <p class="lede" style="margin:0 auto 1.5rem;">Nehmen Sie jetzt Kontakt mit uns auf – wir freuen uns auf Ihre Nachricht.</p>
-    <a class="btn btn-primary" href="kontakt.html">Kontakt aufnehmen</a>
+    <div class="media-copy">
+      <span class="eyebrow">Kontakt</span>
+      <h2>Interesse geweckt?</h2>
+      <p class="lede" style="margin:0 auto 1.5rem;">Nehmen Sie jetzt Kontakt mit uns auf – wir freuen uns auf Ihre Nachricht.</p>
+      <a class="btn btn-primary" href="kontakt.html">Kontakt aufnehmen</a>
+    </div>
   </div>
 </section>
 {{/if}}

@@ -4,12 +4,14 @@ const express = require('express');
 const archiver = require('archiver');
 const { generateSite, renderPreview, slugify, OUTPUT_DIR } = require('./src/generator');
 const { PROFESSIONS } = require('./src/data/professions');
-const { isConfigured: isImageSearchConfigured } = require('./src/images');
+const { isConfigured: isImageSearchConfigured, searchImageOptions } = require('./src/images');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json({ limit: '2mb' }));
+// Großzügiges Limit: hochgeladene Bilder werden als Data-URI im JSON-Body
+// mitgeschickt (Base64 + mehrere Bild-Slots können mehrere MB ausmachen).
+app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 // Generierte Websites lokal ansehbar machen: http://localhost:3000/sites/<slug>/index.html
 app.use('/sites', express.static(OUTPUT_DIR));
@@ -19,6 +21,25 @@ app.get('/professions', (req, res) => {
     professions: PROFESSIONS.map(({ key, label, category }) => ({ key, label, category })),
     imagesEnabled: isImageSearchConfigured(),
   });
+});
+
+// Bild-Picker im Builder: liefert bis zu 10 Kandidatenfotos zu einem
+// Suchbegriff, damit man statt der automatischen Auswahl gezielt ein Bild
+// je Seite/Team-Mitglied auswählen kann.
+app.get('/images/search', async (req, res) => {
+  try {
+    const query = String(req.query.query || '').trim();
+    if (!query) {
+      return res.json({ results: [], imagesEnabled: isImageSearchConfigured() });
+    }
+    const orientation = String(req.query.orientation || 'landscape');
+    const page = parseInt(req.query.page, 10) || 1;
+    const results = await searchImageOptions(query, 10, orientation, page);
+    res.json({ results, imagesEnabled: isImageSearchConfigured() });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Bildersuche fehlgeschlagen.', details: err.message });
+  }
 });
 
 app.post('/preview', async (req, res) => {

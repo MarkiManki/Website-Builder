@@ -63,6 +63,20 @@
         <label>Primärfarbe
           <input type="color" name="design.primaryColor" value="#e8603c">
         </label>
+        <label>Schriftart
+          <select name="design.fontKey" id="font-select">
+            <option value="inter">Inter – Klar &amp; modern</option>
+            <option value="poppins">Poppins – Freundlich &amp; geometrisch</option>
+            <option value="montserrat">Montserrat – Selbstbewusst</option>
+            <option value="space-grotesk" selected>Space Grotesk – Tech &amp; kreativ</option>
+            <option value="sora">Sora – Ruhig &amp; professionell</option>
+            <option value="playfair">Playfair Display – Elegant &amp; redaktionell</option>
+            <option value="merriweather">Merriweather – Warm &amp; vertrauenswürdig</option>
+            <option value="raleway">Raleway – Leicht &amp; stilvoll</option>
+            <option value="dm-serif">DM Serif Display – Boutique-Charakter</option>
+            <option value="work-sans">Work Sans – Sachlich &amp; zeitlos</option>
+          </select>
+        </label>
         <label>E-Mail
           <input type="email" name="business.email" placeholder="kontakt@beispiel.de">
         </label>
@@ -139,6 +153,34 @@
           <input type="text" name="content.home.ctaLink" placeholder="kontakt.html">
         </label>
       </div>
+      <div class="image-picker" data-orientation="landscape">
+        <label class="image-picker-label">Hauptbild (Startseite &amp; Kontakt-Seite)</label>
+        <div class="image-picker-controls">
+          <input type="text" class="image-picker-query" placeholder="Suchbegriff, z. B. photography studio">
+          <button type="button" class="image-picker-search">Bilder laden</button>
+        </div>
+        <div class="image-picker-grid"></div>
+        <button type="button" class="image-picker-more" hidden>Weitere Vorschläge laden</button>
+        <label class="image-picker-upload">
+          oder eigenes Bild hochladen
+          <input type="file" accept="image/*" class="image-picker-file">
+        </label>
+        <input type="hidden" class="image-picker-value" name="design.images.hero">
+      </div>
+      <div class="image-picker" data-orientation="landscape">
+        <label class="image-picker-label">Bild für den Kontakt-Aufruf ("Interesse geweckt?")</label>
+        <div class="image-picker-controls">
+          <input type="text" class="image-picker-query" placeholder="Suchbegriff, z. B. customer service">
+          <button type="button" class="image-picker-search">Bilder laden</button>
+        </div>
+        <div class="image-picker-grid"></div>
+        <button type="button" class="image-picker-more" hidden>Weitere Vorschläge laden</button>
+        <label class="image-picker-upload">
+          oder eigenes Bild hochladen
+          <input type="file" accept="image/*" class="image-picker-file">
+        </label>
+        <input type="hidden" class="image-picker-value" name="design.images.cta">
+      </div>
     </section>
 
     <section class="panel section-toggle" id="section-ueberUns" hidden>
@@ -150,6 +192,20 @@
         <label class="span-2">Text
           <textarea name="content.ueberUns.text" rows="3" placeholder="Wer seid ihr, was macht euch aus?"></textarea>
         </label>
+      </div>
+      <div class="image-picker" data-orientation="landscape">
+        <label class="image-picker-label">Bild neben dem Über-uns-Text</label>
+        <div class="image-picker-controls">
+          <input type="text" class="image-picker-query" placeholder="Suchbegriff, z. B. team meeting office">
+          <button type="button" class="image-picker-search">Bilder laden</button>
+        </div>
+        <div class="image-picker-grid"></div>
+        <button type="button" class="image-picker-more" hidden>Weitere Vorschläge laden</button>
+        <label class="image-picker-upload">
+          oder eigenes Bild hochladen
+          <input type="file" accept="image/*" class="image-picker-file">
+        </label>
+        <input type="hidden" class="image-picker-value" name="design.images.about">
       </div>
       <h3>Team-Mitglieder</h3>
       <div id="team-members" class="repeat-list"></div>
@@ -165,6 +221,20 @@
         <label class="span-2">Einleitungstext
           <textarea name="content.leistungen.intro" rows="2" placeholder="Kurze Einleitung zum Angebot..."></textarea>
         </label>
+      </div>
+      <div class="image-picker" data-orientation="landscape">
+        <label class="image-picker-label">Bild für den Leistungen-Banner</label>
+        <div class="image-picker-controls">
+          <input type="text" class="image-picker-query" placeholder="Suchbegriff, z. B. camera photography">
+          <button type="button" class="image-picker-search">Bilder laden</button>
+        </div>
+        <div class="image-picker-grid"></div>
+        <button type="button" class="image-picker-more" hidden>Weitere Vorschläge laden</button>
+        <label class="image-picker-upload">
+          oder eigenes Bild hochladen
+          <input type="file" accept="image/*" class="image-picker-file">
+        </label>
+        <input type="hidden" class="image-picker-value" name="design.images.services">
       </div>
       <h3>Leistungen</h3>
       <div id="services" class="repeat-list"></div>
@@ -251,11 +321,25 @@
 
   <!-- Templates für dynamische Zeilen -->
   <template id="team-member-template">
-    <div class="repeat-row">
+    <div class="repeat-row repeat-row-team">
       <input type="text" placeholder="Name" data-field="name">
       <input type="text" placeholder="Rolle" data-field="role">
       <input type="text" placeholder="Kurztext" data-field="text">
       <button type="button" class="btn-remove" title="Entfernen">✕</button>
+      <div class="image-picker" data-orientation="portrait">
+        <label class="image-picker-label">Foto (optional, sonst Initialen-Kreis)</label>
+        <div class="image-picker-controls">
+          <input type="text" class="image-picker-query" placeholder="Suchbegriff, z. B. professional portrait woman">
+          <button type="button" class="image-picker-search">Bilder laden</button>
+        </div>
+        <div class="image-picker-grid"></div>
+        <button type="button" class="image-picker-more" hidden>Weitere Vorschläge laden</button>
+        <label class="image-picker-upload">
+          oder eigenes Bild hochladen
+          <input type="file" accept="image/*" class="image-picker-file">
+        </label>
+        <input type="hidden" class="image-picker-value" data-field="photo">
+      </div>
     </div>
   </template>
 

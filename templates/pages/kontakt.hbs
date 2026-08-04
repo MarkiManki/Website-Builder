@@ -1,44 +1,53 @@
 <section class="media-panel reveal{{#if images.hero}} has-image{{/if}}"{{#if images.hero}} style="background-image:url('{{{images.hero.src}}}')"{{/if}}>
   <div class="container">
-    <span class="eyebrow">Kontakt</span>
-    <h1>{{content.kontakt.title}}</h1>
-    {{#if content.kontakt.intro}}
-      <p class="lede">{{content.kontakt.intro}}</p>
-    {{/if}}
+    <div class="media-copy">
+      <span class="eyebrow">Kontakt</span>
+      <h1>{{content.kontakt.title}}</h1>
+      {{#if content.kontakt.intro}}
+        <p class="lede">{{content.kontakt.intro}}</p>
+      {{/if}}
+    </div>
   </div>
 </section>
 
 <section class="section reveal">
   <div class="container">
-    <div class="contact-panel lift">
+    <div class="contact-grid{{#if business.address}} has-map{{/if}}">
+      <div class="contact-panel lift">
+        {{#if business.address}}
+          <div class="contact-row">
+            <span class="label">Adresse</span>
+            <span>{{business.address}}</span>
+          </div>
+        {{/if}}
+        {{#if business.phone}}
+          <div class="contact-row">
+            <span class="label">Telefon</span>
+            <a href="tel:{{business.phone}}">{{business.phone}}</a>
+          </div>
+        {{/if}}
+        {{#if business.email}}
+          <div class="contact-row">
+            <span class="label">E-Mail</span>
+            <a href="mailto:{{business.email}}">{{business.email}}</a>
+          </div>
+        {{/if}}
+        {{#if content.kontakt.openingHours}}
+          <div class="contact-row">
+            <span class="label">Öffnungszeiten</span>
+            <span>{{content.kontakt.openingHours}}</span>
+          </div>
+        {{/if}}
+        {{#if business.address}}
+          <div class="contact-row">
+            <span class="label"></span>
+            <a class="btn btn-secondary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{encodedAddress}}">Route planen</a>
+          </div>
+        {{/if}}
+      </div>
       {{#if business.address}}
-        <div class="contact-row">
-          <span class="label">Adresse</span>
-          <span>{{business.address}}</span>
-        </div>
-      {{/if}}
-      {{#if business.phone}}
-        <div class="contact-row">
-          <span class="label">Telefon</span>
-          <a href="tel:{{business.phone}}">{{business.phone}}</a>
-        </div>
-      {{/if}}
-      {{#if business.email}}
-        <div class="contact-row">
-          <span class="label">E-Mail</span>
-          <a href="mailto:{{business.email}}">{{business.email}}</a>
-        </div>
-      {{/if}}
-      {{#if content.kontakt.openingHours}}
-        <div class="contact-row">
-          <span class="label">Öffnungszeiten</span>
-          <span>{{content.kontakt.openingHours}}</span>
-        </div>
-      {{/if}}
-      {{#if business.address}}
-        <div class="contact-row">
-          <span class="label"></span>
-          <a class="btn btn-secondary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{encodedAddress}}">Route planen</a>
+        <div class="map-embed">
+          <iframe src="https://www.google.com/maps?q={{encodedAddress}}&output=embed" title="Standort auf Google Maps" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
       {{/if}}
     </div>
