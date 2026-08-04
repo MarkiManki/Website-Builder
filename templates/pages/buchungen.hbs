@@ -1,0 +1,186 @@
+<section class="section reveal">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Termin buchen</span>
+      <h1>{{content.buchungen.title}}</h1>
+      {{#if content.buchungen.intro}}
+        <p class="lede">{{content.buchungen.intro}}</p>
+      {{/if}}
+    </div>
+
+    <form id="booking-form" class="booking-form">
+      <div class="grid-2-site">
+        <label>Name*
+          <input type="text" name="name" required>
+        </label>
+        <label>E-Mail*
+          <input type="email" name="email" required>
+        </label>
+        <label>Datum*
+          <input type="date" name="date" required>
+        </label>
+        <label>Uhrzeit*
+          <input type="time" name="time" required>
+        </label>
+      </div>
+      <label>Nachricht (optional)
+        <textarea name="note" rows="3"></textarea>
+      </label>
+      <button type="submit" class="btn btn-primary">Termin anfragen</button>
+      <p id="booking-status" class="booking-status" hidden></p>
+    </form>
+
+    <div class="admin-panel">
+      <button type="button" id="admin-toggle" class="btn-admin-toggle">Admin-Bereich</button>
+
+      <div id="admin-login" class="admin-box" hidden>
+        <h3>Admin-Anmeldung</h3>
+        <form id="admin-login-form">
+          <label>Benutzername oder E-Mail
+            <input type="text" name="identifier" autocomplete="username" required>
+          </label>
+          <label>Passwort
+            <input type="password" name="password" autocomplete="current-password" required>
+          </label>
+          <button type="submit" class="btn btn-secondary">Anmelden</button>
+          <p id="admin-login-error" class="booking-status booking-status-error" hidden></p>
+        </form>
+      </div>
+
+      <div id="admin-calendar" class="admin-box" hidden>
+        <div class="admin-box-header">
+          <h3>Gebuchte Termine</h3>
+          <button type="button" id="admin-logout" class="btn-remove-inline">Abmelden</button>
+        </div>
+        <div id="admin-bookings-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  var form = document.getElementById('booking-form');
+  var status = document.getElementById('booking-status');
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var payload = {
+      name: form.name.value,
+      email: form.email.value,
+      date: form.date.value,
+      time: form.time.value,
+      note: form.note.value,
+    };
+    status.hidden = false;
+    status.className = 'booking-status';
+    status.textContent = 'Wird gebucht…';
+
+    fetch('/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+      .then(function (res) {
+        return res.json().then(function (body) {
+          if (!res.ok) throw new Error(body.error || 'Buchung fehlgeschlagen.');
+          return body;
+        });
+      })
+      .then(function () {
+        status.className = 'booking-status booking-status-success';
+        status.textContent = 'Buchung erfolgreich erstellt! Eine Bestätigungs-E-Mail wurde an ' + payload.email + ' gesendet.';
+        form.reset();
+      })
+      .catch(function (err) {
+        status.className = 'booking-status booking-status-error';
+        status.textContent = 'Fehler: ' + err.message + ' (Hinweis: Login/Buchung funktionieren aktuell nur, wenn diese Seite über "Im Browser öffnen" aus dem Builder aufgerufen wird.)';
+      });
+  });
+
+  var adminToggle = document.getElementById('admin-toggle');
+  var loginBox = document.getElementById('admin-login');
+  var calendarBox = document.getElementById('admin-calendar');
+  var loginForm = document.getElementById('admin-login-form');
+  var loginError = document.getElementById('admin-login-error');
+  var logoutBtn = document.getElementById('admin-logout');
+  var listEl = document.getElementById('admin-bookings-list');
+
+  function renderBookings(bookings) {
+    if (!bookings.length) {
+      listEl.innerHTML = '<p class="hint">Noch keine Termine gebucht.</p>';
+      return;
+    }
+    var byDate = {};
+    bookings.forEach(function (b) {
+      (byDate[b.date] = byDate[b.date] || []).push(b);
+    });
+    var dates = Object.keys(byDate).sort();
+    listEl.innerHTML = dates
+      .map(function (date) {
+        var items = byDate[date];
+        var rows = items
+          .map(function (b) {
+            var note = b.note ? '<br><em>' + b.note + '</em>' : '';
+            return '<li><strong>' + b.time + '</strong> – ' + b.name + ' (' + b.email + ')' + note + '</li>';
+          })
+          .join('');
+        return '<div class="admin-day"><h4>' + date + '</h4><ul>' + rows + '</ul></div>';
+      })
+      .join('');
+  }
+
+  function loadBookings() {
+    fetch('/api/bookings')
+      .then(function (res) { return res.json(); })
+      .then(function (data) { renderBookings(data.bookings || []); });
+  }
+
+  function checkSession() {
+    fetch('/api/session')
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data.isAdmin) {
+          loginBox.hidden = true;
+          calendarBox.hidden = false;
+          loadBookings();
+        }
+      });
+  }
+
+  adminToggle.addEventListener('click', function () {
+    if (!calendarBox.hidden) return;
+    loginBox.hidden = !loginBox.hidden;
+  });
+
+  loginForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    loginError.hidden = true;
+    fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier: loginForm.identifier.value, password: loginForm.password.value }),
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error('Benutzername/E-Mail oder Passwort falsch.');
+        loginBox.hidden = true;
+        calendarBox.hidden = false;
+        loginForm.reset();
+        loadBookings();
+      })
+      .catch(function (err) {
+        loginError.hidden = false;
+        loginError.textContent = err.message;
+      });
+  });
+
+  logoutBtn.addEventListener('click', function () {
+    fetch('/api/logout', { method: 'POST' }).then(function () {
+      calendarBox.hidden = true;
+      loginBox.hidden = false;
+    });
+  });
+
+  checkSession();
+})();
+</script>

@@ -29,27 +29,7 @@
   <form id="builder-form" class="form-col">
 
     <section class="panel">
-      <h2>1. Welche Art von Kunde?</h2>
-      <div class="type-choice">
-        <label class="type-card">
-          <input type="radio" name="type" value="freelancer" checked>
-          <span class="type-card-inner">
-            <strong>Freelancer</strong>
-            <small>Einzelperson, persönlicher Auftritt</small>
-          </span>
-        </label>
-        <label class="type-card">
-          <input type="radio" name="type" value="unternehmen">
-          <span class="type-card-inner">
-            <strong>Kleines Unternehmen</strong>
-            <small>Team, professioneller Auftritt</small>
-          </span>
-        </label>
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2>2. Unternehmensdaten</h2>
+      <h2>1. Unternehmensdaten</h2>
       <div class="grid-2">
         <label>Name / Firma*
           <input type="text" name="business.name" required placeholder="z. B. Max Mustermann Fotografie">
@@ -65,10 +45,10 @@
         </label>
         <label>Schriftart
           <select name="design.fontKey" id="font-select">
-            <option value="inter">Inter – Klar &amp; modern</option>
+            <option value="inter" selected>Inter – Klar &amp; modern</option>
             <option value="poppins">Poppins – Freundlich &amp; geometrisch</option>
             <option value="montserrat">Montserrat – Selbstbewusst</option>
-            <option value="space-grotesk" selected>Space Grotesk – Tech &amp; kreativ</option>
+            <option value="space-grotesk">Space Grotesk – Tech &amp; kreativ</option>
             <option value="sora">Sora – Ruhig &amp; professionell</option>
             <option value="playfair">Playfair Display – Elegant &amp; redaktionell</option>
             <option value="merriweather">Merriweather – Warm &amp; vertrauenswürdig</option>
@@ -93,10 +73,41 @@
         </label>
       </div>
       <p class="hint" id="images-hint">Passende Fotos werden automatisch anhand der Branche geladen, sobald ein Pexels-API-Key eingerichtet ist (siehe README).</p>
+
+      <div class="logo-picker">
+        <label class="image-picker-label">Firmenlogo (optional – ohne Upload erscheint ein Kürzel-Badge)</label>
+        <div class="logo-picker-row">
+          <div class="logo-picker-preview" id="logo-preview"></div>
+          <label class="image-picker-upload">
+            Logo hochladen
+            <input type="file" accept="image/*" id="logo-upload-input">
+          </label>
+          <button type="button" id="logo-remove-btn" class="btn-remove" hidden>✕ Entfernen</button>
+        </div>
+        <input type="hidden" name="business.logo" id="logo-value">
+      </div>
+
+      <div class="social-fields">
+        <label class="image-picker-label">Social Media (optional)</label>
+        <div class="grid-2">
+          <label>Facebook
+            <input type="url" name="business.social.facebook" placeholder="https://facebook.com/...">
+          </label>
+          <label>Instagram
+            <input type="url" name="business.social.instagram" placeholder="https://instagram.com/...">
+          </label>
+          <label>X (Twitter)
+            <input type="url" name="business.social.x" placeholder="https://x.com/...">
+          </label>
+          <label>LinkedIn
+            <input type="url" name="business.social.linkedin" placeholder="https://linkedin.com/company/...">
+          </label>
+        </div>
+      </div>
     </section>
 
     <section class="panel">
-      <h2>3. Welche Seiten soll die Website haben?</h2>
+      <h2>2. Welche Seiten soll die Website haben?</h2>
       <div class="page-choice" id="page-choice">
         <label class="page-item">
           <input type="checkbox" name="pages.home" checked disabled>
@@ -110,9 +121,9 @@
           <input type="checkbox" name="pages.leistungen" data-toggle="section-leistungen">
           Leistungen / Portfolio
         </label>
-        <label class="page-item disabled">
-          <input type="checkbox" disabled>
-          Buchungen <span class="badge badge-soon">demnächst</span>
+        <label class="page-item">
+          <input type="checkbox" name="pages.buchungen" data-toggle="section-buchungen">
+          Buchungen
         </label>
         <label class="page-item disabled">
           <input type="checkbox" disabled>
@@ -138,7 +149,7 @@
     </section>
 
     <section class="panel">
-      <h2>4. Inhalte: Startseite</h2>
+      <h2>3. Inhalte: Startseite</h2>
       <div class="grid-2">
         <label class="span-2">Überschrift*
           <input type="text" name="content.home.headline" required placeholder="z. B. Willkommen bei Mustermann Fotografie">
@@ -257,8 +268,25 @@
       <p class="hint">Adresse, Telefon und E-Mail werden aus Schritt 2 übernommen.</p>
     </section>
 
+    <section class="panel section-toggle" id="section-buchungen" hidden>
+      <h2>Inhalte: Buchungen</h2>
+      <div class="grid-2">
+        <label class="span-2">Titel
+          <input type="text" name="content.buchungen.title" value="Termin buchen">
+        </label>
+        <label class="span-2">Einleitungstext
+          <textarea name="content.buchungen.intro" rows="2" placeholder="z. B. Wählen Sie einen freien Termin – wir bestätigen per E-Mail."></textarea>
+        </label>
+      </div>
+      <p class="hint">
+        Prototyp: Login/Kalender funktionieren aktuell nur, wenn die Website über "Im Browser öffnen"
+        aus diesem Tool aufgerufen wird (nicht im reinen ZIP-Export auf fremdem Hosting).
+        Admin-Login zum Testen: <strong>admin</strong> / <strong>admin</strong>.
+      </p>
+    </section>
+
     <section class="panel">
-      <h2>5. Impressum <span class="badge badge-required">Pflicht</span></h2>
+      <h2>4. Impressum <span class="badge badge-required">Pflicht</span></h2>
       <p class="hint">Rechtlich notwendige Angaben. Bitte im Zweifel juristisch prüfen lassen.</p>
       <div class="grid-2">
         <label>Inhaber / Verantwortliche Person*

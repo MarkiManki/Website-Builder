@@ -9,41 +9,19 @@
   let currentPreviewPage = 'home';
   let previewTimer = null;
 
-  // Vorschlagsfarbe/-schrift je Kundentyp (muss zu den Defaults in src/data/defaults.js passen).
-  const VARIANT_PRIMARY_COLOR = { freelancer: '#e8603c', unternehmen: '#4f46e5' };
-  const VARIANT_DEFAULT_FONT = { freelancer: 'space-grotesk', unternehmen: 'sora' };
-  document.querySelectorAll('input[name="type"]').forEach((radio) => {
-    radio.addEventListener('change', () => {
-      if (!radio.checked) return;
-      const colorInput = form.elements['design.primaryColor'];
-      if (colorInput) colorInput.value = VARIANT_PRIMARY_COLOR[radio.value];
-      const fontSelect = form.elements['design.fontKey'];
-      if (fontSelect) fontSelect.value = VARIANT_DEFAULT_FONT[radio.value];
-    });
-  });
-
   // --- Branchen-Dropdown (steuert die automatische Bildersuche) ---
   const professionSelect = document.getElementById('profession-select');
   const imagesHint = document.getElementById('images-hint');
-  let allProfessions = [];
 
-  function currentType() {
-    const checked = form.querySelector('input[name="type"]:checked');
-    return checked ? checked.value : 'freelancer';
-  }
-
-  function renderProfessionOptions() {
-    const type = currentType();
+  function renderProfessionOptions(professions) {
     const previousValue = professionSelect.value;
     professionSelect.innerHTML = '<option value="">Sonstiges / kein Schwerpunkt</option>';
-    allProfessions
-      .filter((profession) => profession.category === type)
-      .forEach((profession) => {
-        const option = document.createElement('option');
-        option.value = profession.key;
-        option.textContent = profession.label;
-        professionSelect.appendChild(option);
-      });
+    professions.forEach((profession) => {
+      const option = document.createElement('option');
+      option.value = profession.key;
+      option.textContent = profession.label;
+      professionSelect.appendChild(option);
+    });
     if (professionSelect.querySelector(`option[value="${previousValue}"]`)) {
       professionSelect.value = previousValue;
     }
@@ -52,8 +30,7 @@
   fetch('/professions')
     .then((response) => response.json())
     .then((data) => {
-      allProfessions = data.professions || [];
-      renderProfessionOptions();
+      renderProfessionOptions(data.professions || []);
       if (imagesHint) {
         imagesHint.textContent = data.imagesEnabled
           ? 'Passende Fotos werden automatisch anhand der Branche geladen.'
@@ -61,12 +38,6 @@
       }
     })
     .catch((err) => console.error('Branchenliste konnte nicht geladen werden:', err));
-
-  document.querySelectorAll('input[name="type"]').forEach((radio) => {
-    radio.addEventListener('change', () => {
-      if (radio.checked) renderProfessionOptions();
-    });
-  });
 
   // --- Bedingte Abschnitte ein-/ausblenden, wenn eine Seite an-/abgewählt wird ---
   document.querySelectorAll('[data-toggle]').forEach((checkbox) => {
@@ -238,6 +209,43 @@
   }
 
   document.querySelectorAll('.image-picker').forEach(initImagePicker);
+
+  // --- Firmenlogo: nur Upload (keine Pexels-Suche nötig), als Data-URI
+  // gespeichert – ohne Upload bleibt business.logo leer und die Website
+  // zeigt stattdessen automatisch ein Kürzel-Badge (siehe header.hbs). ---
+  const logoInput = document.getElementById('logo-upload-input');
+  const logoValue = document.getElementById('logo-value');
+  const logoPreview = document.getElementById('logo-preview');
+  const logoRemoveBtn = document.getElementById('logo-remove-btn');
+
+  function setLogo(dataUrl) {
+    logoValue.value = dataUrl || '';
+    logoValue.dispatchEvent(new Event('change', { bubbles: true }));
+    logoPreview.innerHTML = dataUrl ? `<img src="${dataUrl}" alt="">` : '';
+    if (logoRemoveBtn) logoRemoveBtn.hidden = !dataUrl;
+  }
+
+  if (logoInput) {
+    logoInput.addEventListener('change', () => {
+      const file = logoInput.files && logoInput.files[0];
+      if (!file) return;
+      if (file.size > MAX_UPLOAD_BYTES) {
+        window.alert('Logo ist zu groß (max. 5 MB). Bitte kleineres Bild wählen.');
+        logoInput.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => setLogo(String(reader.result));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  if (logoRemoveBtn) {
+    logoRemoveBtn.addEventListener('click', () => {
+      if (logoInput) logoInput.value = '';
+      setLogo('');
+    });
+  }
 
   // --- Dynamische Zeilen (Team-Mitglieder, Leistungen) ---
   function addRepeatRow(containerId, templateId, values) {
@@ -425,7 +433,6 @@
   // --- Beispieldaten (mehrere Sets zur Auswahl, für schnellen Vergleich) ---
   const SAMPLE_DATA_SETS = {
     photographer: {
-      type: 'freelancer',
       business: {
         name: 'Lumora Fotostudio',
         tagline: 'Fotografie, die Geschichten erzählt',
@@ -434,6 +441,12 @@
         phone: '+49 30 12345678',
         address: 'Sonnenallee 42, 12045 Berlin',
         profession: 'photographer',
+        social: {
+          facebook: 'https://facebook.com/lumorafotostudio',
+          instagram: 'https://instagram.com/lumorafotostudio',
+          x: '',
+          linkedin: '',
+        },
       },
       primaryColor: '#e8603c',
       home: {
@@ -478,7 +491,6 @@
     },
 
     'personal-trainer': {
-      type: 'freelancer',
       business: {
         name: 'FitForm Personal Training',
         tagline: 'Individuelles Training für echte Ergebnisse',
@@ -487,6 +499,12 @@
         phone: '+49 176 55501234',
         address: 'Bergmannstraße 12, 20359 Hamburg',
         profession: 'personal-trainer',
+        social: {
+          facebook: '',
+          instagram: 'https://instagram.com/fitform.training',
+          x: '',
+          linkedin: '',
+        },
       },
       primaryColor: '#e8603c',
       home: {
@@ -530,7 +548,6 @@
     },
 
     'cafe-bakery': {
-      type: 'unternehmen',
       business: {
         name: 'Bäckerei Sonnenkorn',
         tagline: 'Frisch gebacken seit 1998',
@@ -539,6 +556,12 @@
         phone: '+49 351 4890123',
         address: 'Marktplatz 7, 01067 Dresden',
         profession: 'cafe-bakery',
+        social: {
+          facebook: 'https://facebook.com/baeckerei.sonnenkorn',
+          instagram: 'https://instagram.com/baeckerei.sonnenkorn',
+          x: '',
+          linkedin: '',
+        },
       },
       primaryColor: '#4f46e5',
       home: {
@@ -584,7 +607,6 @@
     },
 
     'car-repair': {
-      type: 'unternehmen',
       business: {
         name: 'AutoService Wagner',
         tagline: 'Ihr Kfz-Meisterbetrieb seit 2003',
@@ -593,6 +615,12 @@
         phone: '+49 221 7789012',
         address: 'Industriestraße 34, 50735 Köln',
         profession: 'car-repair',
+        social: {
+          facebook: 'https://facebook.com/autoservicewagner',
+          instagram: '',
+          x: '',
+          linkedin: 'https://linkedin.com/company/autoservice-wagner',
+        },
       },
       primaryColor: '#4f46e5',
       home: {
@@ -656,13 +684,6 @@
     const SAMPLE_DATA = SAMPLE_DATA_SETS[setKey];
     if (!SAMPLE_DATA) return;
 
-    // Kundentyp zuerst setzen: steuert Branchen-Dropdown-Optionen und Standardfarbe.
-    const typeRadio = form.querySelector(`input[name="type"][value="${SAMPLE_DATA.type}"]`);
-    if (typeRadio) {
-      typeRadio.checked = true;
-      typeRadio.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-
     setValue('business.name', SAMPLE_DATA.business.name);
     setValue('business.tagline', SAMPLE_DATA.business.tagline);
     setValue('business.logoText', SAMPLE_DATA.business.logoText);
@@ -670,6 +691,9 @@
     setValue('business.phone', SAMPLE_DATA.business.phone);
     setValue('business.address', SAMPLE_DATA.business.address);
     setValue('business.profession', SAMPLE_DATA.business.profession);
+    ['facebook', 'instagram', 'x', 'linkedin'].forEach((platform) => {
+      setValue(`business.social.${platform}`, (SAMPLE_DATA.business.social && SAMPLE_DATA.business.social[platform]) || '');
+    });
     setValue('design.primaryColor', SAMPLE_DATA.primaryColor);
 
     setValue('content.home.headline', SAMPLE_DATA.home.headline);

@@ -1,18 +1,10 @@
-// Standardwerte je Varianten-Typ. Werden verwendet, wenn im Formular keine
-// eigene Farbe/Schrift gewählt wurde. Können jederzeit erweitert/angepasst werden.
-const VARIANT_DEFAULTS = {
-  freelancer: {
-    label: 'Freelancer',
-    primaryColor: '#e8603c',
-    radius: '18px',
-    defaultFontKey: 'space-grotesk',
-  },
-  unternehmen: {
-    label: 'Kleines Unternehmen',
-    primaryColor: '#4f46e5',
-    radius: '12px',
-    defaultFontKey: 'sora',
-  },
+// Standardwerte, falls im Formular keine eigene Farbe/Schrift gewählt wurde.
+// Es gibt keine Kundentyp-Unterscheidung (Freelancer/Unternehmen) mehr –
+// alle Branchen und Font-Presets stehen unabhängig davon zur Auswahl.
+const DEFAULTS = {
+  primaryColor: '#4f46e5',
+  radius: '14px',
+  defaultFontKey: 'inter',
 };
 
 // Die 10 meistgenutzten, professionellen Google-Fonts-Kombinationen für
@@ -96,7 +88,7 @@ const PAGE_DEFINITIONS = [
   { key: 'home', label: 'Startseite (Home)', file: 'index.html', required: true, available: true },
   { key: 'ueberUns', label: 'Über uns / Team', file: 'ueber-uns.html', required: false, available: true },
   { key: 'leistungen', label: 'Leistungen / Portfolio', file: 'leistungen.html', required: false, available: true },
-  { key: 'buchungen', label: 'Buchungen', file: 'buchungen.html', required: false, available: false },
+  { key: 'buchungen', label: 'Buchungen', file: 'buchungen.html', required: false, available: true },
   { key: 'leistungDetails', label: 'Einzelne Leistungs-Detailseiten', file: null, required: false, available: false },
   { key: 'karriere', label: 'Karriere / Stellenangebote', file: 'karriere.html', required: false, available: false },
   { key: 'blog', label: 'Blog / News', file: 'blog.html', required: false, available: false },
@@ -104,4 +96,4 @@ const PAGE_DEFINITIONS = [
   { key: 'impressum', label: 'Impressum', file: 'impressum.html', required: true, available: true },
 ];
 
-module.exports = { VARIANT_DEFAULTS, FONT_PRESETS, PAGE_DEFINITIONS };
+module.exports = { DEFAULTS, FONT_PRESETS, PAGE_DEFINITIONS };

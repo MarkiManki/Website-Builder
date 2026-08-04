@@ -18,12 +18,11 @@ npm start        # startet das Tool
 
 Danach im Browser öffnen: **http://localhost:3000**
 
-1. Kundentyp wählen: Freelancer oder Kleines Unternehmen
-2. Unternehmensdaten eintragen (Name, Kontakt, Primärfarbe, Branche, ...)
-3. Gewünschte Seiten per Checkbox aktivieren (Home & Impressum sind immer dabei)
-4. Inhalte für die aktivierten Seiten ausfüllen
-5. Impressumsdaten eintragen (Pflichtangaben)
-6. Auf "Website generieren" klicken → es wird automatisch eine ZIP-Datei heruntergeladen
+1. Unternehmensdaten eintragen (Name, Kontakt, Primärfarbe, Schriftart, Branche, ...)
+2. Gewünschte Seiten per Checkbox aktivieren (Home & Impressum sind immer dabei)
+3. Inhalte für die aktivierten Seiten ausfüllen
+4. Impressumsdaten eintragen (Pflichtangaben)
+5. Auf "Website generieren" klicken → es wird automatisch eine ZIP-Datei heruntergeladen
 
 ### Automatische Fotos (optional, aber empfohlen)
 
@@ -46,6 +45,26 @@ einfach den Inhalt per FTP/Datei-Upload beim Hosting-Anbieter hochladen.
 > aber keine rechtliche Prüfung. Vor Veröffentlichung im Zweifel von einer Anwältin/einem
 > Anwalt gegenprüfen lassen.
 
+### Buchungen: Login + Terminkalender (Prototyp)
+
+Die Seite "Buchungen" enthält ein öffentliches Buchungsformular (Name, E-Mail, Datum,
+Uhrzeit) sowie einen Admin-Bereich mit Kalender-Übersicht der gebuchten Termine.
+
+- **Admin-Login zum Testen:** Benutzername/E-Mail `admin`, Passwort `admin`
+- **Speicherung:** nur im Arbeitsspeicher des Builder-Servers – bei `npm start`-Neustart
+  sind alle Buchungen wieder weg. Eine dauerhafte Speicherung (Datei/Datenbank) folgt,
+  sobald geklärt ist, wie die fertige Kundenwebsite mit Buchung gehostet wird.
+- **Wichtig:** Login/Kalender funktionieren nur, wenn die Seite über den Button
+  **"Im Browser öffnen"** aus diesem Tool aufgerufen wird (selber Server/Origin). Im
+  reinen ZIP-Export, hochgeladen auf ein rein statisches Hosting ohne eigenen Server,
+  funktioniert die Buchung aktuell **nicht** – das ist eine bewusste, vorübergehende
+  Einschränkung dieses Prototyps.
+- **Terminbestätigung per E-Mail:** Ohne eigene SMTP-Zugangsdaten wird automatisch ein
+  kostenloses Ethereal-Testkonto genutzt – die Mail wird nicht wirklich zugestellt, aber
+  eine Vorschau-URL landet im Terminal (Server-Log). Für echten Versand `SMTP_HOST` /
+  `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` / `SMTP_FROM` in `.env` eintragen (siehe
+  `.env.example`).
+
 ## Aktueller Funktionsumfang (MVP)
 
 Bereits verfügbare Seiten-Bausteine:
@@ -54,11 +73,11 @@ Bereits verfügbare Seiten-Bausteine:
 - [x] Über uns / Team
 - [x] Leistungen / Portfolio
 - [x] Kontakt & Anfahrt
+- [x] Buchungen – Login/Kalender-Prototyp, siehe oben
 - [x] Impressum – Pflicht
 
 Im Formular sichtbar, aber noch nicht umgesetzt (Phase 2, als "demnächst" markiert):
 
-- [ ] Buchungen
 - [ ] Einzelne Leistungs-Detailseiten
 - [ ] Karriere / Stellenangebote
 - [ ] Blog / News
@@ -69,7 +88,9 @@ Im Formular sichtbar, aber noch nicht umgesetzt (Phase 2, als "demnächst" marki
 server.js                 Express-Server: liefert das Formular aus, nimmt Eingaben entgegen
 src/generator.js           Baut aus den Formulardaten die fertigen HTML-Seiten
 src/images.js               Bildersuche über die Pexels-API (inkl. Cache)
-src/data/defaults.js       Verfügbare Seiten + Standardwerte je Kundentyp (Farben, Schriften)
+src/bookings.js              In-Memory-Speicher für Terminbuchungen (Prototyp)
+src/mailer.js                Terminbestätigungs-Mails (Ethereal-Test oder eigenes SMTP)
+src/data/defaults.js       Verfügbare Seiten + Standardfarbe/-schrift + Font-Presets
 src/data/professions.js     Branchen-Liste fürs Dropdown + Bildersuchbegriffe
 templates/                 HTML-Bausteine (Handlebars) + Basis-CSS/JS der generierten Website
 public/                    Formular-Oberfläche des Builder-Tools selbst
@@ -79,8 +100,8 @@ output/                    Generierte Websites (wird lokal erzeugt, nicht eingec
 ## Neue Branchen hinzufügen (für später)
 
 Einfach einen neuen Eintrag in `src/data/professions.js` ergänzen (Key, deutsches
-Label, Kategorie `freelancer`/`unternehmen` und 1-2 englische Suchbegriffe für
-Pexels). Taucht danach automatisch im Formular-Dropdown auf.
+Label und 1-2 englische Suchbegriffe für Pexels). Taucht danach automatisch im
+Formular-Dropdown auf.
 
 ## Neue Seiten-Bausteine hinzufügen (für später)
 

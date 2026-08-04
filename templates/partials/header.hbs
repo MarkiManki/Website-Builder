@@ -1,6 +1,11 @@
 <header class="site-header">
   <div class="container header-inner">
     <a class="brand" href="{{assetPrefix}}index.html">
+      {{#if business.logo}}
+        <img class="brand-logo" src="{{{business.logo}}}" alt="">
+      {{else}}
+        <span class="brand-logo brand-logo-badge">{{business.name.[0]}}</span>
+      {{/if}}
       {{#if business.logoText}}
         <span class="brand-text">{{business.logoText}}</span>
       {{else}}

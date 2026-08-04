@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const Handlebars = require('handlebars');
-const { VARIANT_DEFAULTS, FONT_PRESETS, PAGE_DEFINITIONS } = require('./data/defaults');
+const { DEFAULTS, FONT_PRESETS, PAGE_DEFINITIONS } = require('./data/defaults');
 const { PROFESSIONS, GENERIC_FALLBACK } = require('./data/professions');
 const { getImages } = require('./images');
 
@@ -32,6 +32,7 @@ const PAGE_TEMPLATE_FILES = {
   ueberUns: 'pages/ueber-uns.hbs',
   leistungen: 'pages/leistungen.hbs',
   kontakt: 'pages/kontakt.hbs',
+  buchungen: 'pages/buchungen.hbs',
   impressum: 'pages/impressum.hbs',
 };
 
@@ -40,8 +41,6 @@ function buildEnabledPages(selectedPages) {
 }
 
 function buildContext(formData) {
-  const type = formData.type === 'unternehmen' ? 'unternehmen' : 'freelancer';
-  const variantDefaults = VARIANT_DEFAULTS[type];
   const business = formData.business || {};
   const content = formData.content || {};
 
@@ -63,14 +62,13 @@ function buildContext(formData) {
 
   const requestedFontKey = formData.design && formData.design.fontKey;
   const fontPreset = FONT_PRESETS.find((f) => f.key === requestedFontKey)
-    || FONT_PRESETS.find((f) => f.key === variantDefaults.defaultFontKey)
+    || FONT_PRESETS.find((f) => f.key === DEFAULTS.defaultFontKey)
     || FONT_PRESETS[0];
 
   return {
-    type,
     design: {
-      primaryColor: (formData.design && formData.design.primaryColor) || variantDefaults.primaryColor,
-      radius: variantDefaults.radius,
+      primaryColor: (formData.design && formData.design.primaryColor) || DEFAULTS.primaryColor,
+      radius: DEFAULTS.radius,
       fontHeading: fontPreset.fontHeading,
       fontBody: fontPreset.fontBody,
       googleFontsUrl: fontPreset.googleFontsUrl,
@@ -90,10 +88,10 @@ function buildContext(formData) {
 // gewählten Branche. Ohne konfigurierten API-Key liefert getImages() leere
 // Arrays, sodass images.* einfach null bleibt und die Templates ohne Bilder
 // rendern (siehe {{#if images.hero}} in den Seiten-Templates).
-async function resolveImages(formData, type) {
+async function resolveImages(formData) {
   const professionKey = formData.business && formData.business.profession;
   const profession = professionKey ? PROFESSIONS.find((p) => p.key === professionKey) : null;
-  const fallback = GENERIC_FALLBACK[type];
+  const fallback = GENERIC_FALLBACK;
   const terms = (profession || fallback).searchTerms;
   const label = profession ? profession.label : fallback.label;
 
@@ -170,7 +168,7 @@ function renderPage(pageKey, context, options = {}) {
 async function renderPreview(formData) {
   registerPartials();
   const context = buildContext(formData);
-  context.images = await resolveImages(formData, context.type);
+  context.images = await resolveImages(formData);
   attachServiceImages(context);
 
   const pages = {};
@@ -194,7 +192,7 @@ async function renderPreview(formData) {
 async function generateSite(formData) {
   registerPartials();
   const context = buildContext(formData);
-  context.images = await resolveImages(formData, context.type);
+  context.images = await resolveImages(formData);
   attachServiceImages(context);
 
   const slug = `${slugify(formData.business && formData.business.name)}-${Date.now()}`;
