@@ -54,19 +54,26 @@ html {
 
 body {
   margin: 0;
-  /* Die Topbar ist jetzt position:fixed (siehe .site-topbar) und daher aus
-     dem normalen Layoutfluss raus – dieser Abstand reserviert exakt ihren
-     Platz. Bewusst der EINE, konstante (ungescrollte) Messwert: würde er mit
-     der Topbar mitschrumpfen, würde die Hero-Höhe (100vh - Topbar) nicht
-     mehr zur tatsächlichen Seite passen und die nächste Sektion würde beim
-     Scrollen kurz durchscheinen. */
+  /* Die Topbar ist position:fixed (siehe .site-topbar) und daher aus dem
+     normalen Layoutfluss raus – dieser Abstand reserviert ihren Platz.
+     Er wechselt synchron mit der Topbar zwischen großem und geschrumpftem
+     Zustand (per :has() unten), mit derselben Transition-Dauer – so bleibt
+     padding-top immer exakt so groß wie die Leiste gerade tatsächlich ist,
+     ohne Lücke währenddessen. Für die Hero-Höhenrechnung (100vh - Topbar)
+     wird trotzdem nur der große, ungescrollte Wert verwendet (siehe .hero),
+     sonst würde der Hero beim Scrollen selbst mitspringen. */
   padding-top: var(--topbar-height);
+  transition: padding-top 0.35s var(--ease);
   font-family: var(--font-body);
   color: var(--ink);
   background: var(--surface);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+body:has(.site-topbar.is-scrolled) {
+  padding-top: var(--topbar-height-scrolled);
 }
 
 img { max-width: 100%; display: block; }
@@ -156,18 +163,19 @@ a:hover { text-decoration: underline; }
   box-shadow: var(--shadow-md);
 }
 
-/* Bewusst KONSTANTE Höhe (kein Schrumpfen beim Scrollen mehr): Der Fixed-
-   Topbar-Trick reserviert über body{padding-top} nur die ungescrollte
-   Höhe (siehe oben). Würde die Leiste selbst beim Scrollen kleiner werden,
-   entstünde in genau dem Moment ein Lücke/weißer Spalt zwischen der
-   (kleineren) Leiste und dem reservierten (größeren) Platz – sichtbar vor
-   allem beim Zurückscrollen, während die Leiste wieder wächst. */
 .header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.25rem;
   padding: 1.1rem var(--gutter);
+  transition: padding 0.35s var(--ease);
+}
+
+/* Beim Scrollen spürbar kompakter – body{padding-top} schrumpft dank
+   :has() synchron mit (siehe oben), daher keine Lücke mehr. */
+.site-topbar.is-scrolled .header-inner {
+  padding: 0.5rem var(--gutter);
 }
 
 .brand {
@@ -203,6 +211,11 @@ a:hover { text-decoration: underline; }
   font-size: 1.4rem;
   color: var(--on-dark);
   letter-spacing: -0.015em;
+  transition: font-size 0.35s var(--ease);
+}
+
+.site-topbar.is-scrolled .brand-text {
+  font-size: 1.05rem;
 }
 
 /* ---------- Nav-Tabs (inline in der Leiste) ---------- */
@@ -244,6 +257,82 @@ a:hover { text-decoration: underline; }
   text-decoration: none;
 }
 
+/* ---------- Anmelden-Reiter (Admin heute, später auch Kund:innen) ---------- */
+.nav-login-item {
+  position: relative;
+  margin-left: 0.4rem;
+  display: flex;
+  align-items: center;
+}
+
+.nav-login-btn {
+  background: rgba(255, 250, 245, 0.14);
+  border: 1px solid rgba(255, 250, 245, 0.35);
+  color: var(--on-dark);
+  border-radius: 999px;
+  padding: 0.5rem 1.1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+
+.nav-login-btn:hover {
+  background: rgba(255, 250, 245, 0.26);
+}
+
+.nav-login-btn.is-logged-in {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.nav-login-dropdown {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  width: 260px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 4px);
+  box-shadow: var(--shadow-lg);
+  padding: 1.25rem;
+  z-index: 50;
+}
+
+.nav-login-dropdown label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.85rem;
+}
+
+.nav-login-dropdown input {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: normal;
+  color: var(--ink);
+}
+
+.nav-login-dropdown .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.nav-login-error {
+  margin: 0.75rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #b91c1c;
+}
+
 /* ---------- Hamburger-Umschalter ---------- */
 .nav-toggle {
   display: none;
@@ -259,6 +348,12 @@ a:hover { text-decoration: underline; }
   flex-direction: column;
   gap: 4px;
   flex-shrink: 0;
+  transition: width 0.35s var(--ease), height 0.35s var(--ease);
+}
+
+.site-topbar.is-scrolled .nav-toggle {
+  width: 36px;
+  height: 36px;
 }
 
 .nav-toggle span {
@@ -842,80 +937,39 @@ a:hover { text-decoration: underline; }
 .booking-status-success { color: #15803d; }
 .booking-status-error { color: #b91c1c; }
 
-.admin-panel {
-  margin-top: 3rem;
+/* Tabs: "Buchungen" ist immer Standard; "Kalender" wird per JS erst
+   eingeblendet, wenn eine Admin-Session besteht (siehe Skript in
+   buchungen.hbs) – gehört bewusst zusammen mit dem Buchungsformular auf
+   derselben Seite, statt als separater Login-Kasten darunter. */
+.booking-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+  border-bottom: 1px solid var(--border);
 }
 
-.btn-admin-toggle {
+.booking-tab {
   background: none;
-  border: 1px dashed var(--border);
-  border-radius: 999px;
-  padding: 0.5rem 1.1rem;
-  font-size: 0.85rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.75rem 0.25rem;
+  margin-bottom: -1px;
+  font-size: 0.98rem;
   font-weight: 600;
   color: var(--ink-faint);
   cursor: pointer;
 }
 
-.btn-admin-toggle:hover {
-  border-color: var(--primary);
+.booking-tab:hover {
+  color: var(--ink);
+}
+
+.booking-tab.active {
   color: var(--primary);
+  border-bottom-color: var(--primary);
 }
 
-.admin-box {
-  max-width: 480px;
-  margin-top: 1.25rem;
-  background: var(--surface-muted);
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) + 4px);
-  padding: 1.75rem;
-}
-
-.admin-box h3 {
-  margin-bottom: 1rem;
-}
-
-.admin-box label {
-  display: block;
-  font-weight: 600;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-}
-
-.admin-box input {
-  display: block;
-  width: 100%;
-  margin-top: 0.4rem;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: normal;
-}
-
-.admin-box-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.admin-box-header h3 {
-  margin-bottom: 0;
-}
-
-.btn-remove-inline {
-  background: none;
-  border: none;
-  color: #b91c1c;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-#admin-calendar {
+.booking-panel[data-panel="kalender"] {
   max-width: 640px;
 }
 

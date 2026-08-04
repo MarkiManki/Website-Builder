@@ -3,5 +3,20 @@
     {{#each navLinks}}
       <li><a href="{{this.href}}" {{#if this.active}}class="active" aria-current="page"{{/if}}>{{this.label}}</a></li>
     {{/each}}
+    <li class="nav-login-item">
+      <button type="button" id="nav-login-toggle" class="nav-login-btn">Anmelden</button>
+      <div id="nav-login-dropdown" class="nav-login-dropdown" hidden>
+        <form id="nav-login-form">
+          <label>Benutzername oder E-Mail
+            <input type="text" name="identifier" autocomplete="username" required>
+          </label>
+          <label>Passwort
+            <input type="password" name="password" autocomplete="current-password" required>
+          </label>
+          <button type="submit" class="btn btn-primary">Anmelden</button>
+          <p id="nav-login-error" class="nav-login-error" hidden></p>
+        </form>
+      </div>
+    </li>
   </ul>
 </nav>

@@ -448,6 +448,7 @@
           linkedin: '',
         },
       },
+      logoQuery: 'camera logo icon',
       primaryColor: '#e8603c',
       home: {
         headline: 'Willkommen bei Lumora Fotostudio',
@@ -506,6 +507,7 @@
           linkedin: '',
         },
       },
+      logoQuery: 'fitness gym logo icon',
       primaryColor: '#e8603c',
       home: {
         headline: 'Erreiche deine Ziele mit FitForm',
@@ -563,6 +565,7 @@
           linkedin: '',
         },
       },
+      logoQuery: 'bakery logo icon',
       primaryColor: '#4f46e5',
       home: {
         headline: 'Willkommen bei Bäckerei Sonnenkorn',
@@ -622,6 +625,7 @@
           linkedin: 'https://linkedin.com/company/autoservice-wagner',
         },
       },
+      logoQuery: 'garage car repair logo icon',
       primaryColor: '#4f46e5',
       home: {
         headline: 'AutoService Wagner – Ihre Werkstatt in Köln',
@@ -679,10 +683,29 @@
     if (section) section.hidden = false;
   }
 
-  function fillSampleData() {
+  // Sucht ein zufälliges Vorschaubild bei Pexels (Suchbegriff je Sample-Set)
+  // und nutzt es als Firmenlogo fürs Mockup, statt das Feld leer zu lassen.
+  async function fetchSampleLogo(query) {
+    if (!query) return '';
+    try {
+      const response = await fetch(`/images/search?query=${encodeURIComponent(query)}&orientation=square&page=1`);
+      const data = await response.json();
+      if (!data.imagesEnabled || !data.results || !data.results.length) return '';
+      const pick = data.results[Math.floor(Math.random() * data.results.length)];
+      return pick.thumb || '';
+    } catch (err) {
+      console.error('Zufallslogo konnte nicht geladen werden:', err);
+      return '';
+    }
+  }
+
+  async function fillSampleData() {
     const setKey = document.getElementById('sample-data-select').value;
     const SAMPLE_DATA = SAMPLE_DATA_SETS[setKey];
     if (!SAMPLE_DATA) return;
+
+    const logoUrl = await fetchSampleLogo(SAMPLE_DATA.logoQuery);
+    setLogo(logoUrl);
 
     setValue('business.name', SAMPLE_DATA.business.name);
     setValue('business.tagline', SAMPLE_DATA.business.tagline);
