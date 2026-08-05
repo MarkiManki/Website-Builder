@@ -15,10 +15,14 @@
       </div>
       <div class="sample-data-controls">
         <select id="sample-data-select">
-          <option value="photographer">Fotograf:in (Freelancer)</option>
-          <option value="personal-trainer">Personal Trainer (Freelancer)</option>
-          <option value="cafe-bakery">Café / Bäckerei (Unternehmen)</option>
-          <option value="car-repair">Kfz-Werkstatt (Unternehmen)</option>
+          <option value="photographer">Fotograf:in</option>
+          <option value="personal-trainer">Personal Trainer</option>
+          <option value="barber">Friseur:in / Barbier</option>
+          <option value="beauty">Massage-/Kosmetikstudio</option>
+          <option value="cafe-bakery">Café / Bäckerei</option>
+          <option value="restaurant">Restaurant</option>
+          <option value="car-repair">Kfz-Werkstatt</option>
+          <option value="vet">Tierarztpraxis</option>
         </select>
         <button type="button" id="sample-data-btn" class="btn-sample">Beispieldaten einfügen</button>
       </div>
@@ -277,7 +281,23 @@
         <label class="span-2">Einleitungstext
           <textarea name="content.buchungen.intro" rows="2" placeholder="z. B. Wählen Sie einen freien Termin – wir bestätigen per E-Mail."></textarea>
         </label>
+        <label>Verfügbar von
+          <select name="content.buchungen.startHour" id="buchungen-start-select"></select>
+        </label>
+        <label>Verfügbar bis
+          <select name="content.buchungen.endHour" id="buchungen-end-select"></select>
+        </label>
+        <label>Zeitraster
+          <select name="content.buchungen.slotInterval">
+            <option value="15">Viertelstunden (15 Min.)</option>
+            <option value="30" selected>Halbe Stunden (30 Min.)</option>
+            <option value="60">Ganze Stunden (60 Min.)</option>
+          </select>
+        </label>
       </div>
+      <p class="hint">
+        Auf der Buchungsseite kann dann nur noch eine Uhrzeit im gewählten Zeitraum und Raster gewählt werden.
+      </p>
       <p class="hint">
         Prototyp: Login/Kalender funktionieren aktuell nur, wenn die Website über "Im Browser öffnen"
         aus diesem Tool aufgerufen wird (nicht im reinen ZIP-Export auf fremdem Hosting).

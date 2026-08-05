@@ -81,12 +81,18 @@ app.get('/api/session', (req, res) => {
 });
 
 app.post('/api/bookings', async (req, res) => {
-  const { name, email, date, time, note } = req.body || {};
+  const { name, email, date, time, note, skipEmail } = req.body || {};
   if (!name || !email || !date || !time) {
     return res.status(400).json({ error: 'Name, E-Mail, Datum und Uhrzeit sind erforderlich.' });
   }
 
   const booking = addBooking({ name, email, date, time, note });
+
+  // skipEmail: von den Beispieldaten genutzt, um beim Anlegen mehrerer
+  // Demo-Termine nicht jedes Mal eine (Test-)Bestätigungsmail zu erzeugen.
+  if (skipEmail) {
+    return res.json({ ok: true, booking, previewUrl: null });
+  }
 
   try {
     const previewUrl = await sendBookingConfirmation(booking);

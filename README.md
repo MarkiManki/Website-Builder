@@ -47,10 +47,17 @@ einfach den Inhalt per FTP/Datei-Upload beim Hosting-Anbieter hochladen.
 
 ### Buchungen: Login + Terminkalender (Prototyp)
 
-Die Seite "Buchungen" enthält ein öffentliches Buchungsformular (Name, E-Mail, Datum,
-Uhrzeit) sowie einen Admin-Bereich mit Kalender-Übersicht der gebuchten Termine.
+Die Seite "Buchungen" enthält zwei Tabs: **Buchungen** (öffentliches Formular – Name,
+E-Mail, Datum, Uhrzeit) und **Kalender** (echte Monatsansicht mit allen gebuchten
+Terminen, taucht als Tab nur auf, wenn eine Admin-Session besteht).
 
-- **Admin-Login zum Testen:** Benutzername/E-Mail `admin`, Passwort `admin`
+- **Zeitraster einstellbar:** Im Formularabschnitt "Inhalte: Buchungen" legt man fest,
+  in welchem Zeitraum (z. B. 8–18 Uhr) und in welchem Raster (Viertel-/Halb-/Ganzstunden)
+  Termine überhaupt wählbar sind – auf der Website steht dann nur noch ein Dropdown mit
+  den passenden Uhrzeiten zur Auswahl, keine Freitext-Uhrzeit mehr.
+- **Admin-Login zum Testen:** Reiter "Anmelden" oben rechts in der Navigation (auf jeder
+  Seite), Benutzername/E-Mail `admin`, Passwort `admin`. Der Kalender-Tab aktualisiert
+  sich bei jedem Öffnen automatisch – kein erneutes Anmelden nötig, um neue Termine zu sehen.
 - **Speicherung:** nur im Arbeitsspeicher des Builder-Servers – bei `npm start`-Neustart
   sind alle Buchungen wieder weg. Eine dauerhafte Speicherung (Datei/Datenbank) folgt,
   sobald geklärt ist, wie die fertige Kundenwebsite mit Buchung gehostet wird.
@@ -64,6 +71,11 @@ Uhrzeit) sowie einen Admin-Bereich mit Kalender-Übersicht der gebuchten Termine
   eine Vorschau-URL landet im Terminal (Server-Log). Für echten Versand `SMTP_HOST` /
   `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` / `SMTP_FROM` in `.env` eintragen (siehe
   `.env.example`).
+- **Beispieldaten:** Jedes der 8 Beispieldaten-Sets legt beim Einfügen automatisch ein
+  paar Demo-Termine in den nächsten 30 Tagen an (passend zum jeweiligen Zeitraster),
+  damit der Admin-Kalender nicht leer aussieht. Diese Demo-Termine bleiben bis zum
+  nächsten Server-Neustart bestehen und sammeln sich beim mehrfachen Wechseln der
+  Beispieldaten an (kein automatisches Aufräumen zwischen Sets).
 
 ## Aktueller Funktionsumfang (MVP)
 

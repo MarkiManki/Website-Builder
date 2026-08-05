@@ -9,6 +9,20 @@
   let currentPreviewPage = 'home';
   let previewTimer = null;
 
+  // --- Buchungen: Stunden-Dropdowns (von/bis) für den verfügbaren Zeitraum ---
+  function populateHourSelect(select, maxHour, defaultValue) {
+    if (!select) return;
+    for (let h = 0; h <= maxHour; h += 1) {
+      const option = document.createElement('option');
+      option.value = String(h);
+      option.textContent = `${String(h).padStart(2, '0')}:00 Uhr`;
+      if (h === defaultValue) option.selected = true;
+      select.appendChild(option);
+    }
+  }
+  populateHourSelect(document.getElementById('buchungen-start-select'), 23, 8);
+  populateHourSelect(document.getElementById('buchungen-end-select'), 24, 18);
+
   // --- Branchen-Dropdown (steuert die automatische Bildersuche) ---
   const professionSelect = document.getElementById('profession-select');
   const imagesHint = document.getElementById('images-hint');
@@ -478,6 +492,13 @@
         intro: 'Wir freuen uns auf Ihre Nachricht – meldet euch gerne unverbindlich.',
         openingHours: 'Mo–Fr 9:00–18:00 Uhr, Termine nach Vereinbarung',
       },
+      buchungen: {
+        title: 'Fototermin buchen',
+        intro: 'Sichern Sie sich Ihren Termin für ein Fotoshooting.',
+        startHour: 9,
+        endHour: 18,
+        slotInterval: 60,
+      },
       impressum: {
         inhaber: 'Anna Berger',
         firma: 'Lumora Fotostudio',
@@ -535,6 +556,13 @@
         title: 'Kontakt',
         intro: 'Schreib mir für ein kostenloses Erstgespräch.',
         openingHours: 'Mo–Sa 7:00–20:00 Uhr, Termine nach Vereinbarung',
+      },
+      buchungen: {
+        title: 'Trainingstermin buchen',
+        intro: 'Wähle deinen Termin für ein Personal-Training.',
+        startHour: 7,
+        endHour: 20,
+        slotInterval: 60,
       },
       impressum: {
         inhaber: 'Jonas Keller',
@@ -594,6 +622,13 @@
         title: 'Kontakt & Anfahrt',
         intro: 'Wir freuen uns auf Ihren Besuch.',
         openingHours: 'Di–Sa 6:00–18:00 Uhr, So 7:00–12:00 Uhr, Mo Ruhetag',
+      },
+      buchungen: {
+        title: 'Tisch reservieren',
+        intro: 'Reservieren Sie Ihren Tisch bei uns – für Frühstück, Kaffee oder Kuchen.',
+        startHour: 8,
+        endHour: 18,
+        slotInterval: 30,
       },
       impressum: {
         inhaber: 'Petra Sonnenkorn',
@@ -655,6 +690,13 @@
         intro: 'Vereinbaren Sie einen Termin – wir beraten Sie gerne.',
         openingHours: 'Mo–Fr 7:30–18:00 Uhr, Sa 9:00–13:00 Uhr',
       },
+      buchungen: {
+        title: 'Werkstatttermin buchen',
+        intro: 'Vereinbaren Sie einen Termin für Wartung oder Reparatur.',
+        startHour: 8,
+        endHour: 17,
+        slotInterval: 30,
+      },
       impressum: {
         inhaber: 'Stefan Wagner',
         firma: 'AutoService Wagner GmbH',
@@ -666,6 +708,268 @@
         ustId: 'DE756412398',
         handelsregister: 'Amtsgericht Köln, HRB 98123',
         verantwortlicher: 'Stefan Wagner, Industriestraße 34, 50735 Köln',
+      },
+    },
+
+    barber: {
+      business: {
+        name: 'Kammer & Klinge Barbershop',
+        tagline: 'Klassischer Herrenschnitt, moderner Stil',
+        logoText: 'Kammer & Klinge',
+        email: 'termin@kammerklinge.de',
+        phone: '+49 40 33221100',
+        address: 'Schulterblatt 22, 20357 Hamburg',
+        profession: 'barber',
+        social: {
+          facebook: 'https://facebook.com/kammerklinge',
+          instagram: 'https://instagram.com/kammerklinge',
+          x: '',
+          linkedin: '',
+        },
+      },
+      logoQuery: 'barber shop logo icon',
+      primaryColor: '#e8603c',
+      home: {
+        headline: 'Willkommen bei Kammer & Klinge',
+        subheadline: 'Klassischer Herrenschnitt, modern interpretiert',
+        ctaText: 'Termin buchen',
+        ctaLink: 'buchungen.html',
+      },
+      ueberUns: {
+        title: 'Über uns',
+        text: 'Seit 2018 verbinden wir traditionelles Barbierhandwerk mit modernem Stil.',
+        team: [
+          { name: 'Kevin Brandt', role: 'Barbier & Inhaber', text: 'Spezialist für Fades und Bartpflege.' },
+        ],
+      },
+      leistungen: {
+        title: 'Unsere Leistungen',
+        intro: 'Das bieten wir an:',
+        services: [
+          { name: 'Herrenschnitt', description: 'Klassisch oder modern, ganz nach Wunsch.' },
+          { name: 'Bartpflege', description: 'Trimmen, Rasur und Pflege.' },
+          { name: 'Kinderhaarschnitt', description: 'Entspannt für die Kleinen.' },
+        ],
+      },
+      kontakt: {
+        title: 'Kontakt',
+        intro: 'Wir freuen uns auf Ihren Besuch.',
+        openingHours: 'Di–Sa 9:00–19:00 Uhr',
+      },
+      buchungen: {
+        title: 'Termin buchen',
+        intro: 'Buchen Sie Ihren Friseurtermin ganz einfach online.',
+        startHour: 9,
+        endHour: 19,
+        slotInterval: 30,
+      },
+      impressum: {
+        inhaber: 'Kevin Brandt',
+        firma: 'Kammer & Klinge Barbershop',
+        strasse: 'Schulterblatt 22',
+        plzOrt: '20357 Hamburg',
+        land: 'Deutschland',
+        telefon: '+49 40 33221100',
+        email: 'termin@kammerklinge.de',
+        ustId: '',
+        verantwortlicher: 'Kevin Brandt, Schulterblatt 22, 20357 Hamburg',
+      },
+    },
+
+    beauty: {
+      business: {
+        name: 'Studio Lumina',
+        tagline: 'Wellness & Beauty für Körper und Geist',
+        logoText: 'Lumina',
+        email: 'info@studio-lumina.de',
+        phone: '+49 89 44556677',
+        address: 'Leopoldstraße 55, 80802 München',
+        profession: 'beauty',
+        social: {
+          facebook: '',
+          instagram: 'https://instagram.com/studiolumina',
+          x: '',
+          linkedin: '',
+        },
+      },
+      logoQuery: 'spa wellness logo icon',
+      primaryColor: '#4f46e5',
+      home: {
+        headline: 'Willkommen im Studio Lumina',
+        subheadline: 'Ihre Auszeit für Wellness und Schönheit',
+        ctaText: 'Behandlung buchen',
+        ctaLink: 'buchungen.html',
+      },
+      ueberUns: {
+        title: 'Über uns',
+        text: 'Seit 2015 verwöhnen wir unsere Gäste mit individuellen Beauty- und Massage-Anwendungen.',
+        team: [
+          { name: 'Sophie Klein', role: 'Kosmetikerin & Inhaberin', text: 'Expertin für Gesichtsbehandlungen.' },
+          { name: 'Nina Braun', role: 'Massagetherapeutin', text: 'Spezialisiert auf klassische Massagen.' },
+        ],
+      },
+      leistungen: {
+        title: 'Unsere Behandlungen',
+        intro: 'Das bieten wir an:',
+        services: [
+          { name: 'Gesichtsbehandlung', description: 'Individuell abgestimmt auf Ihren Hauttyp.' },
+          { name: 'Klassische Massage', description: 'Entspannung für Körper und Geist.' },
+          { name: 'Maniküre & Pediküre', description: 'Gepflegte Hände und Füße.' },
+        ],
+      },
+      kontakt: {
+        title: 'Kontakt',
+        intro: 'Wir freuen uns auf Ihre Anfrage.',
+        openingHours: 'Mo–Sa 9:00–20:00 Uhr',
+      },
+      buchungen: {
+        title: 'Behandlung buchen',
+        intro: 'Reservieren Sie Ihre Wellness-Behandlung ganz bequem online.',
+        startHour: 9,
+        endHour: 20,
+        slotInterval: 30,
+      },
+      impressum: {
+        inhaber: 'Sophie Klein',
+        firma: 'Studio Lumina',
+        strasse: 'Leopoldstraße 55',
+        plzOrt: '80802 München',
+        land: 'Deutschland',
+        telefon: '+49 89 44556677',
+        email: 'info@studio-lumina.de',
+        ustId: 'DE223344556',
+        verantwortlicher: 'Sophie Klein, Leopoldstraße 55, 80802 München',
+      },
+    },
+
+    vet: {
+      business: {
+        name: 'Tierarztpraxis Amrein',
+        tagline: 'Liebevolle Betreuung für Ihre Tiere',
+        logoText: 'Amrein',
+        email: 'praxis@tierarzt-amrein.de',
+        phone: '+49 711 998877',
+        address: 'Rotebühlstraße 88, 70197 Stuttgart',
+        profession: 'vet',
+        social: {
+          facebook: 'https://facebook.com/tierarztamrein',
+          instagram: '',
+          x: '',
+          linkedin: '',
+        },
+      },
+      logoQuery: 'veterinary clinic logo icon',
+      primaryColor: '#4f46e5',
+      home: {
+        headline: 'Willkommen bei Tierarztpraxis Amrein',
+        subheadline: 'Kompetente tierärztliche Versorgung mit Herz',
+        ctaText: 'Termin vereinbaren',
+        ctaLink: 'buchungen.html',
+      },
+      ueberUns: {
+        title: 'Über uns',
+        text: 'Seit 2010 kümmern wir uns mit Fachwissen und Empathie um das Wohl Ihrer Tiere.',
+        team: [
+          { name: 'Dr. Lena Amrein', role: 'Tierärztin & Praxisinhaberin', text: 'Spezialisiert auf Kleintiermedizin.' },
+        ],
+      },
+      leistungen: {
+        title: 'Unsere Leistungen',
+        intro: 'Das bieten wir an:',
+        services: [
+          { name: 'Vorsorge & Impfungen', description: 'Regelmäßige Check-ups für Ihr Tier.' },
+          { name: 'Diagnostik', description: 'Moderne Untersuchungsmethoden vor Ort.' },
+          { name: 'Chirurgie', description: 'Operative Eingriffe in vertrauensvoller Umgebung.' },
+        ],
+      },
+      kontakt: {
+        title: 'Kontakt',
+        intro: 'Im Notfall rufen Sie uns bitte direkt an.',
+        openingHours: 'Mo–Fr 8:00–18:00 Uhr, Sa 9:00–12:00 Uhr',
+      },
+      buchungen: {
+        title: 'Termin vereinbaren',
+        intro: 'Vereinbaren Sie einen Termin für Ihr Tier – wir melden uns zur Bestätigung.',
+        startHour: 8,
+        endHour: 18,
+        slotInterval: 30,
+      },
+      impressum: {
+        inhaber: 'Dr. Lena Amrein',
+        firma: 'Tierarztpraxis Amrein',
+        strasse: 'Rotebühlstraße 88',
+        plzOrt: '70197 Stuttgart',
+        land: 'Deutschland',
+        telefon: '+49 711 998877',
+        email: 'praxis@tierarzt-amrein.de',
+        ustId: '',
+        verantwortlicher: 'Dr. Lena Amrein, Rotebühlstraße 88, 70197 Stuttgart',
+      },
+    },
+
+    restaurant: {
+      business: {
+        name: 'Ristorante Bellavia',
+        tagline: 'Italienische Küche mit Leidenschaft',
+        logoText: 'Bellavia',
+        email: 'reservierung@bellavia-restaurant.de',
+        phone: '+49 211 776655',
+        address: 'Ratinger Straße 14, 40213 Düsseldorf',
+        profession: 'restaurant',
+        social: {
+          facebook: 'https://facebook.com/bellaviarestaurant',
+          instagram: 'https://instagram.com/bellaviarestaurant',
+          x: '',
+          linkedin: '',
+        },
+      },
+      logoQuery: 'italian restaurant logo icon',
+      primaryColor: '#e8603c',
+      home: {
+        headline: 'Willkommen im Ristorante Bellavia',
+        subheadline: 'Authentische italienische Küche in Düsseldorf',
+        ctaText: 'Tisch reservieren',
+        ctaLink: 'buchungen.html',
+      },
+      ueberUns: {
+        title: 'Über uns',
+        text: 'Seit 2012 verwöhnen wir unsere Gäste mit traditionellen italienischen Rezepten.',
+        team: [
+          { name: 'Marco Rossi', role: 'Küchenchef & Inhaber', text: 'Gebürtig aus der Toskana, seit 20 Jahren in der Gastronomie.' },
+        ],
+      },
+      leistungen: {
+        title: 'Unser Angebot',
+        intro: 'Das erwartet Sie bei uns:',
+        services: [
+          { name: 'Pasta & Risotto', description: 'Hausgemacht, nach original italienischen Rezepten.' },
+          { name: 'Steinofen-Pizza', description: 'Knusprig aus dem Steinofen.' },
+          { name: 'Weinauswahl', description: 'Ausgewählte italienische Weine.' },
+        ],
+      },
+      kontakt: {
+        title: 'Kontakt & Anfahrt',
+        intro: 'Wir freuen uns auf Ihren Besuch.',
+        openingHours: 'Di–So 12:00–23:00 Uhr, Mo Ruhetag',
+      },
+      buchungen: {
+        title: 'Tisch reservieren',
+        intro: 'Reservieren Sie Ihren Tisch bequem online.',
+        startHour: 11,
+        endHour: 22,
+        slotInterval: 30,
+      },
+      impressum: {
+        inhaber: 'Marco Rossi',
+        firma: 'Ristorante Bellavia GmbH',
+        strasse: 'Ratinger Straße 14',
+        plzOrt: '40213 Düsseldorf',
+        land: 'Deutschland',
+        telefon: '+49 211 776655',
+        email: 'reservierung@bellavia-restaurant.de',
+        ustId: 'DE334455667',
+        handelsregister: 'Amtsgericht Düsseldorf, HRB 55443',
+        verantwortlicher: 'Marco Rossi, Ratinger Straße 14, 40213 Düsseldorf',
       },
     },
   };
@@ -697,6 +1001,74 @@
       console.error('Zufallslogo konnte nicht geladen werden:', err);
       return '';
     }
+  }
+
+  // Legt ein paar Demo-Termine in den nächsten 30 Tagen an (verschiedene Tage/
+  // Uhrzeiten, passend zum Zeitraster des jeweiligen Beispiel-Sets), damit der
+  // Admin-Kalender beim Ausprobieren nicht leer aussieht. skipEmail:true, damit
+  // dabei keine Test-Bestätigungsmails erzeugt werden.
+  const DEMO_CUSTOMERS = [
+    { name: 'Anna Keller', email: 'anna.keller@example.com' },
+    { name: 'Tom Fischer', email: 'tom.fischer@example.com' },
+    { name: 'Laura Weiß', email: 'laura.weiss@example.com' },
+    { name: 'Jonas Bauer', email: 'jonas.bauer@example.com' },
+    { name: 'Mia Schulz', email: 'mia.schulz@example.com' },
+    { name: 'Paul Hoffmann', email: 'paul.hoffmann@example.com' },
+  ];
+
+  function buildSlotList(startHour, endHour, interval) {
+    const slots = [];
+    for (let m = startHour * 60; m < endHour * 60; m += interval) {
+      const hh = String(Math.floor(m / 60)).padStart(2, '0');
+      const mm = String(m % 60).padStart(2, '0');
+      slots.push(`${hh}:${mm}`);
+    }
+    return slots;
+  }
+
+  async function seedDemoBookings(buchungenSettings) {
+    const slots = buildSlotList(buchungenSettings.startHour, buchungenSettings.endHour, buchungenSettings.slotInterval);
+    if (!slots.length) return;
+
+    const usedSlots = new Set();
+    const requests = [];
+    const count = 6;
+
+    for (let i = 0; i < count; i += 1) {
+      let dayOffset;
+      let time;
+      let key;
+      let attempts = 0;
+      do {
+        dayOffset = 1 + Math.floor(Math.random() * 29);
+        time = slots[Math.floor(Math.random() * slots.length)];
+        key = `${dayOffset}::${time}`;
+        attempts += 1;
+      } while (usedSlots.has(key) && attempts < 20);
+      usedSlots.add(key);
+
+      const date = new Date();
+      date.setDate(date.getDate() + dayOffset);
+      const dateStr = date.toISOString().slice(0, 10);
+      const customer = DEMO_CUSTOMERS[Math.floor(Math.random() * DEMO_CUSTOMERS.length)];
+
+      requests.push(
+        fetch('/api/bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: customer.name,
+            email: customer.email,
+            date: dateStr,
+            time,
+            note: 'Beispieltermin',
+            skipEmail: true,
+          }),
+        }).catch(() => {})
+      );
+    }
+
+    await Promise.all(requests);
   }
 
   async function fillSampleData() {
@@ -741,15 +1113,29 @@
     setValue('content.kontakt.intro', SAMPLE_DATA.kontakt.intro);
     setValue('content.kontakt.openingHours', SAMPLE_DATA.kontakt.openingHours);
 
+    setValue('content.buchungen.title', SAMPLE_DATA.buchungen.title);
+    setValue('content.buchungen.intro', SAMPLE_DATA.buchungen.intro);
+    setValue('content.buchungen.startHour', String(SAMPLE_DATA.buchungen.startHour));
+    setValue('content.buchungen.endHour', String(SAMPLE_DATA.buchungen.endHour));
+    setValue('content.buchungen.slotInterval', String(SAMPLE_DATA.buchungen.slotInterval));
+
     ['inhaber', 'firma', 'strasse', 'plzOrt', 'land', 'telefon', 'email', 'ustId', 'handelsregister', 'aufsichtsbehoerde', 'verantwortlicher']
       .forEach((field) => setValue(`content.impressum.${field}`, ''));
     Object.keys(SAMPLE_DATA.impressum).forEach((field) => {
       setValue(`content.impressum.${field}`, SAMPLE_DATA.impressum[field]);
     });
 
-    statusMsg.textContent = 'Beispieldaten eingefügt.';
+    statusMsg.textContent = 'Beispieldaten eingefügt. Lege Demo-Termine an…';
     statusMsg.className = 'status-msg success';
     schedulePreviewUpdate();
+
+    seedDemoBookings(SAMPLE_DATA.buchungen)
+      .then(() => {
+        statusMsg.textContent = 'Beispieldaten eingefügt, inkl. Demo-Terminen für den Admin-Kalender.';
+      })
+      .catch((err) => {
+        console.error('Demo-Termine konnten nicht angelegt werden:', err);
+      });
   }
 
   document.getElementById('sample-data-btn').addEventListener('click', fillSampleData);

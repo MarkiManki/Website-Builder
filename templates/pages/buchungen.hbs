@@ -14,7 +14,13 @@
     </div>
 
     <div class="booking-panel" data-panel="buchen">
-      <form id="booking-form" class="booking-form">
+      <form
+        id="booking-form"
+        class="booking-form"
+        data-start-hour="{{content.buchungen.startHour}}"
+        data-end-hour="{{content.buchungen.endHour}}"
+        data-slot-interval="{{content.buchungen.slotInterval}}"
+      >
         <div class="grid-2-site">
           <label>Name*
             <input type="text" name="name" required>
@@ -26,7 +32,9 @@
             <input type="date" name="date" required>
           </label>
           <label>Uhrzeit*
-            <input type="time" name="time" required>
+            <select name="time" required>
+              <option value="">Bitte wählen</option>
+            </select>
           </label>
         </div>
         <label>Nachricht (optional)
@@ -38,15 +46,56 @@
     </div>
 
     <div class="booking-panel" data-panel="kalender" hidden>
-      <div id="admin-bookings-list"></div>
+      <div class="calendar">
+        <div class="calendar-header">
+          <button type="button" id="cal-prev" aria-label="Vorheriger Monat">‹</button>
+          <h3 id="cal-month-label"></h3>
+          <button type="button" id="cal-next" aria-label="Nächster Monat">›</button>
+        </div>
+        <div class="calendar-weekdays">
+          <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+        </div>
+        <div class="calendar-grid" id="cal-grid"></div>
+      </div>
+      <div class="calendar-day-detail" id="cal-day-detail">
+        <p class="hint">Tag im Kalender auswählen, um die Termine zu sehen.</p>
+      </div>
     </div>
   </div>
 </section>
 
 <script>
 (function () {
+  // --- Zeit-Dropdown: nur Uhrzeiten im eingestellten Zeitraum/Raster wählbar ---
   var form = document.getElementById('booking-form');
   var status = document.getElementById('booking-status');
+  var timeSelect = form.querySelector('select[name="time"]');
+
+  function getSlotSettings() {
+    var startHour = parseInt(form.dataset.startHour, 10);
+    var endHour = parseInt(form.dataset.endHour, 10);
+    var interval = parseInt(form.dataset.slotInterval, 10);
+    if (isNaN(startHour) || startHour < 0 || startHour > 23) startHour = 8;
+    if (isNaN(endHour) || endHour <= startHour || endHour > 24) endHour = 18;
+    if ([15, 30, 60].indexOf(interval) === -1) interval = 30;
+    return { startHour: startHour, endHour: endHour, interval: interval };
+  }
+
+  function buildTimeOptions() {
+    var settings = getSlotSettings();
+    timeSelect.innerHTML = '<option value="">Bitte wählen</option>';
+    for (var m = settings.startHour * 60; m < settings.endHour * 60; m += settings.interval) {
+      var hh = String(Math.floor(m / 60)).padStart(2, '0');
+      var mm = String(m % 60).padStart(2, '0');
+      var label = hh + ':' + mm;
+      var opt = document.createElement('option');
+      opt.value = label;
+      opt.textContent = label + ' Uhr';
+      timeSelect.appendChild(opt);
+    }
+  }
+
+  buildTimeOptions();
 
   form.addEventListener('submit', function (event) {
     event.preventDefault();
@@ -76,6 +125,9 @@
         status.className = 'booking-status booking-status-success';
         status.textContent = 'Buchung erfolgreich erstellt! Eine Bestätigungs-E-Mail wurde an ' + payload.email + ' gesendet.';
         form.reset();
+        buildTimeOptions();
+        // Direkt sichtbar für den Admin, ohne Neu-Login/Reload – siehe loadBookings unten.
+        if (kalenderTabBtn && !kalenderTabBtn.hidden) loadBookings();
       })
       .catch(function (err) {
         status.className = 'booking-status booking-status-error';
@@ -84,7 +136,9 @@
   });
 
   // --- Tabs: "Buchungen" ist immer Standard, "Kalender" taucht nur für
-  // eingeloggte Admins überhaupt als Tab auf (siehe checkSession unten). ---
+  // eingeloggte Admins überhaupt als Tab auf. Beim Wechsel auf "Kalender"
+  // wird jedes Mal neu geladen, damit auch frisch eingegangene Termine
+  // sofort sichtbar sind (kein erneuter Login nötig). ---
   var tabs = document.querySelectorAll('.booking-tab');
   var panels = document.querySelectorAll('.booking-panel');
 
@@ -95,43 +149,107 @@
     panels.forEach(function (panel) {
       panel.hidden = panel.dataset.panel !== name;
     });
+    if (name === 'kalender') loadBookings();
   }
 
   tabs.forEach(function (tab) {
     tab.addEventListener('click', function () { activateTab(tab.dataset.tab); });
   });
 
+  // --- Admin: echter Monats-Kalender statt Liste ---
   var kalenderTabBtn = document.getElementById('tab-kalender-btn');
-  var listEl = document.getElementById('admin-bookings-list');
+  var monthLabel = document.getElementById('cal-month-label');
+  var gridEl = document.getElementById('cal-grid');
+  var detailEl = document.getElementById('cal-day-detail');
+  var prevBtn = document.getElementById('cal-prev');
+  var nextBtn = document.getElementById('cal-next');
 
-  function renderBookings(bookings) {
-    if (!bookings.length) {
-      listEl.innerHTML = '<p class="hint">Noch keine Termine gebucht.</p>';
+  var MONTH_NAMES = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+  var bookingsByDate = {};
+  var viewDate = new Date();
+  viewDate.setDate(1);
+  var selectedDate = formatDate(new Date());
+
+  function formatDate(d) {
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  }
+
+  function renderDayDetail(dateStr) {
+    selectedDate = dateStr;
+    var items = (bookingsByDate[dateStr] || []).slice().sort(function (a, b) { return a.time.localeCompare(b.time); });
+    if (!items.length) {
+      detailEl.innerHTML = '<h4>' + dateStr + '</h4><p class="hint">Keine Termine an diesem Tag.</p>';
       return;
     }
-    var byDate = {};
-    bookings.forEach(function (b) {
-      (byDate[b.date] = byDate[b.date] || []).push(b);
-    });
-    var dates = Object.keys(byDate).sort();
-    listEl.innerHTML = dates
-      .map(function (date) {
-        var items = byDate[date];
-        var rows = items
-          .map(function (b) {
-            var note = b.note ? '<br><em>' + b.note + '</em>' : '';
-            return '<li><strong>' + b.time + '</strong> – ' + b.name + ' (' + b.email + ')' + note + '</li>';
-          })
-          .join('');
-        return '<div class="admin-day"><h4>' + date + '</h4><ul>' + rows + '</ul></div>';
+    var rows = items
+      .map(function (b) {
+        var note = b.note ? '<br><em>' + b.note + '</em>' : '';
+        return '<li><strong>' + b.time + '</strong> – ' + b.name + ' (' + b.email + ')' + note + '</li>';
       })
       .join('');
+    detailEl.innerHTML = '<h4>' + dateStr + '</h4><ul>' + rows + '</ul>';
   }
+
+  function renderCalendarGrid() {
+    monthLabel.textContent = MONTH_NAMES[viewDate.getMonth()] + ' ' + viewDate.getFullYear();
+    gridEl.innerHTML = '';
+
+    var firstOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1);
+    var startWeekday = (firstOfMonth.getDay() + 6) % 7; // Montag = 0
+    var daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+    var todayStr = formatDate(new Date());
+
+    for (var i = 0; i < startWeekday; i += 1) {
+      var blank = document.createElement('div');
+      blank.className = 'calendar-day calendar-day-empty';
+      gridEl.appendChild(blank);
+    }
+
+    for (var day = 1; day <= daysInMonth; day += 1) {
+      var cellDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
+      var dateStr = formatDate(cellDate);
+      var count = (bookingsByDate[dateStr] || []).length;
+
+      var cell = document.createElement('button');
+      cell.type = 'button';
+      cell.className = 'calendar-day';
+      if (dateStr === todayStr) cell.classList.add('is-today');
+      if (dateStr === selectedDate) cell.classList.add('is-selected');
+      cell.dataset.date = dateStr;
+      cell.innerHTML = '<span class="calendar-day-num">' + day + '</span>' + (count ? '<span class="calendar-day-badge">' + count + '</span>' : '');
+      cell.addEventListener('click', function () {
+        gridEl.querySelectorAll('.calendar-day').forEach(function (el) { el.classList.remove('is-selected'); });
+        this.classList.add('is-selected');
+        renderDayDetail(this.dataset.date);
+      });
+      gridEl.appendChild(cell);
+    }
+
+    renderDayDetail(selectedDate);
+  }
+
+  prevBtn.addEventListener('click', function () {
+    viewDate.setMonth(viewDate.getMonth() - 1);
+    renderCalendarGrid();
+  });
+  nextBtn.addEventListener('click', function () {
+    viewDate.setMonth(viewDate.getMonth() + 1);
+    renderCalendarGrid();
+  });
 
   function loadBookings() {
     fetch('/api/bookings')
       .then(function (res) { return res.json(); })
-      .then(function (data) { renderBookings(data.bookings || []); });
+      .then(function (data) {
+        bookingsByDate = {};
+        (data.bookings || []).forEach(function (b) {
+          (bookingsByDate[b.date] = bookingsByDate[b.date] || []).push(b);
+        });
+        renderCalendarGrid();
+      });
   }
 
   fetch('/api/session')
