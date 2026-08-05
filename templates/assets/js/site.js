@@ -4,25 +4,39 @@
   var nav = document.querySelector('.site-nav');
   var narrowQuery = window.matchMedia('(max-width: 860px)');
 
-  // Misst BEIDE Zustände (groß/ungescrollt und klein/gescrollt) einmalig bei
-  // Bedarf (Start/Resize/Font-Ready), nicht bei jedem Scroll-Event. body{}
-  // wechselt per CSS (:has(.is-scrolled)) synchron zwischen beiden Werten,
-  // mit derselben Transition-Dauer wie die Leiste selbst – dadurch bleibt
-  // padding-top immer exakt so groß wie die Leiste gerade ist, auch mitten
-  // in der Schrumpf-Animation, ohne Lücke. Für die Hero-Höhenrechnung
-  // (100vh - Topbar) wird weiterhin nur der große Wert verwendet, siehe CSS.
+  // --topbar-height ist die GROSSE, ungescrollte Höhe – einmalig gemessen
+  // (Start/Resize/Font-Ready), NICHT live. Nur dafür verwendet (siehe CSS):
+  // die Hero-Höhe (100vh - Topbar). Würde dieser Wert beim Scrollen
+  // mitschrumpfen, würde der Hero selbst live springen.
   function setTopbarHeightVar() {
     if (!topbar) return;
     var wasScrolled = topbar.classList.contains('is-scrolled');
-
     topbar.classList.remove('is-scrolled');
-    var largeHeight = topbar.offsetHeight;
-    topbar.classList.add('is-scrolled');
-    var smallHeight = topbar.offsetHeight;
+    var height = topbar.offsetHeight;
     topbar.classList.toggle('is-scrolled', wasScrolled);
+    document.documentElement.style.setProperty('--topbar-height', height + 'px');
+  }
 
-    document.documentElement.style.setProperty('--topbar-height', largeHeight + 'px');
-    document.documentElement.style.setProperty('--topbar-height-scrolled', smallHeight + 'px');
+  // --topbar-height-live verfolgt die TATSÄCHLICHE, aktuelle Höhe der Leiste
+  // in Echtzeit (auch während der Schrumpf-Animation selbst) und treibt
+  // body{padding-top}. Zwei per CSS nur "gleichzeitig gestartete" Übergänge
+  // laufen erfahrungsgemäß leicht auseinander (Rundung, Timing) – das erzeugt
+  // genau den kurzen weißen Spalt. Ein ResizeObserver umgeht das komplett,
+  // weil er die Höhe jeden Frame direkt von der echten Box abliest, statt
+  // sie separat zu animieren.
+  function watchTopbarLiveHeight() {
+    if (!topbar) return;
+    var setLiveHeight = function () {
+      document.documentElement.style.setProperty('--topbar-height-live', topbar.getBoundingClientRect().height + 'px');
+    };
+    setLiveHeight();
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(setLiveHeight).observe(topbar);
+    } else {
+      // Sehr alte Browser ohne ResizeObserver: wenigstens bei Scroll/Resize nachziehen.
+      window.addEventListener('scroll', setLiveHeight, { passive: true });
+      window.addEventListener('resize', setLiveHeight);
+    }
   }
 
   function closeNav() {
@@ -34,11 +48,10 @@
   // Die Leiste wird beim Scrollen kompakter und leicht transparent (Glass-
   // Effekt), behält aber ihren Farbton (siehe .is-scrolled im CSS). Sie ist
   // bewusst position:fixed statt sticky (body reserviert via padding-top
-  // den Platz, siehe CSS) und schrumpft dabei synchron mit body{padding-top}
-  // mit, damit keine Lücke entsteht. Nav-Tabs werden zum Hamburger-Dropdown
-  // zusammengeklappt, sobald gescrollt wurde ODER der Viewport zu schmal für
-  // die Tabs ist – dieselbe "collapsed"-Logik für beide Fälle, siehe
-  // .nav-collapsed im CSS.
+  // den Platz, live nachgeführt von watchTopbarLiveHeight() oben). Nav-Tabs
+  // werden zum Hamburger-Dropdown zusammengeklappt, sobald gescrollt wurde
+  // ODER der Viewport zu schmal für die Tabs ist – dieselbe "collapsed"-
+  // Logik für beide Fälle, siehe .nav-collapsed im CSS.
   function updateTopbarState() {
     if (!topbar) return;
     var scrolled = window.scrollY > 8;
@@ -51,6 +64,7 @@
 
   if (topbar) {
     setTopbarHeightVar();
+    watchTopbarLiveHeight();
     updateTopbarState();
     window.addEventListener('scroll', updateTopbarState, { passive: true });
     window.addEventListener('resize', setTopbarHeightVar);

@@ -46,6 +46,7 @@
      setTopbarHeightVar) – verhindert, dass der Hero beim allerersten Paint
      kurz falsch hoch ist. */
   --topbar-height: 78px;
+  --topbar-height-live: 78px;
 }
 
 html {
@@ -56,24 +57,23 @@ body {
   margin: 0;
   /* Die Topbar ist position:fixed (siehe .site-topbar) und daher aus dem
      normalen Layoutfluss raus – dieser Abstand reserviert ihren Platz.
-     Er wechselt synchron mit der Topbar zwischen großem und geschrumpftem
-     Zustand (per :has() unten), mit derselben Transition-Dauer – so bleibt
-     padding-top immer exakt so groß wie die Leiste gerade tatsächlich ist,
-     ohne Lücke währenddessen. Für die Hero-Höhenrechnung (100vh - Topbar)
-     wird trotzdem nur der große, ungescrollte Wert verwendet (siehe .hero),
-     sonst würde der Hero beim Scrollen selbst mitspringen. */
-  padding-top: var(--topbar-height);
-  transition: padding-top 0.35s var(--ease);
+     --topbar-height-live wird von site.js per ResizeObserver JEDEN Frame
+     auf die tatsächliche, aktuelle Höhe der Leiste gesetzt (auch mitten in
+     deren Schrumpf-Animation) – dadurch ist padding-top immer exakt so
+     groß wie die Leiste gerade wirklich ist, ohne separate CSS-Transition.
+     Zwei nur "gleichzeitig gestartete" Übergänge liefen hier leicht
+     auseinander (Rundung/Timing) und erzeugten kurz einen weißen Spalt;
+     das direkte Live-Nachführen umgeht das Problem komplett. Für die Hero-
+     Höhenrechnung (100vh - Topbar) wird bewusst weiterhin nur der große,
+     ungescrollte --topbar-height verwendet (siehe .hero), sonst würde der
+     Hero beim Scrollen selbst mitspringen. */
+  padding-top: var(--topbar-height-live);
   font-family: var(--font-body);
   color: var(--ink);
   background: var(--surface);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-}
-
-body:has(.site-topbar.is-scrolled) {
-  padding-top: var(--topbar-height-scrolled);
 }
 
 img { max-width: 100%; display: block; }
@@ -138,9 +138,10 @@ a:hover { text-decoration: underline; }
 /* Header und Nav sind EINE Zeile (kein zweiter Streifen darunter). Bewusst
    position:fixed statt sticky: die Leiste darf beim Scrollen schrumpfen,
    ohne dass sich dadurch der Dokumentfluss verschiebt (body übernimmt den
-   Platz via padding-top: var(--topbar-height), siehe oben). Sonst würde ein
-   schrumpfender Header die Hero-Höhenrechnung (100vh - Topbar) live
-   unterlaufen und die nächste Sektion würde beim Scrollen durchscheinen. */
+   Platz via padding-top: var(--topbar-height-live), live nachgeführt –
+   siehe oben). Für die Hero-Höhenrechnung (100vh - Topbar) zählt trotzdem
+   nur der große, ungescrollte --topbar-height, sonst würde der Hero beim
+   Scrollen selbst mitspringen. */
 .site-topbar {
   position: fixed;
   top: 0;
