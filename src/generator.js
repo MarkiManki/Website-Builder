@@ -97,12 +97,12 @@ async function resolveImages(formData) {
 
   const queries = terms[1] && terms[1] !== terms[0] ? [terms[0], terms[1]] : [terms[0]];
 
-  // 4 feste Plätze (Hero/Über-uns/Leistungen-Panel/CTA) + optional ein Bild
-  // pro einzelner Leistung für die Leistungs-Karten. Freitext-Leistungsnamen
-  // eignen sich nicht als eigene Pexels-Suche (meist Deutsch), daher wird
-  // hier stattdessen aus dem ohnehin branchenpassenden Such-Pool bedient.
+  // 5 feste Plätze (Hero/Über-uns/Leistungen-Panel/CTA/Buchungen) + optional
+  // ein Bild pro einzelner Leistung für die Leistungs-Karten. Freitext-
+  // Leistungsnamen eignen sich nicht als eigene Pexels-Suche (meist Deutsch),
+  // daher wird hier stattdessen aus dem ohnehin branchenpassenden Such-Pool bedient.
   const services = (formData.content && formData.content.leistungen && formData.content.leistungen.services) || [];
-  const perQueryCount = Math.max(4, Math.ceil((4 + services.length) / queries.length));
+  const perQueryCount = Math.max(5, Math.ceil((5 + services.length) / queries.length));
 
   const results = await Promise.all(queries.map((term) => getImages(term, perQueryCount)));
   const pool = [].concat(...results);
@@ -119,7 +119,8 @@ async function resolveImages(formData) {
     about: pick('about', withAlt(pool[1] || pool[0])),
     services: pick('services', withAlt(pool[2] || pool[1] || pool[0])),
     cta: pick('cta', withAlt(pool[3] || pool[0])),
-    serviceImages: services.map((_, i) => withAlt(pool[4 + i])),
+    buchungen: pick('buchungen', withAlt(pool[4] || pool[0])),
+    serviceImages: services.map((_, i) => withAlt(pool[5 + i])),
   };
 }
 

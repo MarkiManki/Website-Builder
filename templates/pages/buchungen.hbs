@@ -14,49 +14,68 @@
     </div>
 
     <div class="booking-panel" data-panel="buchen">
-      <form
-        id="booking-form"
-        class="booking-form"
-        data-start-hour="{{content.buchungen.startHour}}"
-        data-end-hour="{{content.buchungen.endHour}}"
-        data-slot-interval="{{content.buchungen.slotInterval}}"
-      >
-        <div class="grid-2-site">
-          <label>Name*
-            <input type="text" name="name" required>
+      <div class="booking-grid{{#if images.buchungen}} has-image{{/if}}">
+        <form
+          id="booking-form"
+          class="booking-form"
+          data-start-hour="{{content.buchungen.startHour}}"
+          data-end-hour="{{content.buchungen.endHour}}"
+          data-slot-interval="{{content.buchungen.slotInterval}}"
+        >
+          <div class="grid-2-site">
+            <label>Name*
+              <input type="text" name="name" required>
+            </label>
+            <label>E-Mail*
+              <input type="email" name="email" required>
+            </label>
+            <label>Datum*
+              <input type="date" name="date" required>
+            </label>
+            <label>Uhrzeit*
+              <select name="time" required>
+                <option value="">Bitte wählen</option>
+              </select>
+            </label>
+          </div>
+          <label>Nachricht (optional)
+            <textarea name="note" rows="3"></textarea>
           </label>
-          <label>E-Mail*
-            <input type="email" name="email" required>
-          </label>
-          <label>Datum*
-            <input type="date" name="date" required>
-          </label>
-          <label>Uhrzeit*
-            <select name="time" required>
-              <option value="">Bitte wählen</option>
-            </select>
-          </label>
-        </div>
-        <label>Nachricht (optional)
-          <textarea name="note" rows="3"></textarea>
-        </label>
-        <button type="submit" class="btn btn-primary">Termin anfragen</button>
-        <p id="booking-status" class="booking-status" hidden></p>
-      </form>
+          <button type="submit" class="btn btn-primary">Termin anfragen</button>
+          <p id="booking-status" class="booking-status" hidden></p>
+        </form>
+        {{#if images.buchungen}}
+          <div class="booking-media">
+            <img src="{{{images.buchungen.src}}}" alt="{{images.buchungen.alt}}" loading="lazy">
+          </div>
+        {{/if}}
+      </div>
     </div>
 
     <div class="booking-panel" data-panel="kalender" hidden>
       <div class="calendar">
         <div class="calendar-header">
-          <button type="button" id="cal-prev" aria-label="Vorheriger Monat">‹</button>
-          <h3 id="cal-month-label"></h3>
-          <button type="button" id="cal-next" aria-label="Nächster Monat">›</button>
+          <div class="calendar-nav">
+            <button type="button" id="cal-prev" aria-label="Zurück">‹</button>
+            <h3 id="cal-label"></h3>
+            <button type="button" id="cal-next" aria-label="Weiter">›</button>
+          </div>
+          <div class="calendar-view-toggle">
+            <button type="button" class="view-toggle-btn active" data-view="monat">Monat</button>
+            <button type="button" class="view-toggle-btn" data-view="woche">Woche</button>
+          </div>
         </div>
-        <div class="calendar-weekdays">
-          <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+
+        <div class="calendar-month-view" id="cal-month-view">
+          <div class="calendar-weekdays">
+            <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+          </div>
+          <div class="calendar-grid" id="cal-grid"></div>
         </div>
-        <div class="calendar-grid" id="cal-grid"></div>
+
+        <div class="calendar-week-view" id="cal-week-view" hidden></div>
       </div>
+
       <div class="calendar-day-detail" id="cal-day-detail">
         <p class="hint">Tag im Kalender auswählen, um die Termine zu sehen.</p>
       </div>
@@ -66,6 +85,19 @@
 
 <script>
 (function () {
+  function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+
+  function formatDate(d) {
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  }
+
   // --- Zeit-Dropdown: nur Uhrzeiten im eingestellten Zeitraum/Raster wählbar ---
   var form = document.getElementById('booking-form');
   var status = document.getElementById('booking-status');
@@ -126,7 +158,6 @@
         status.textContent = 'Buchung erfolgreich erstellt! Eine Bestätigungs-E-Mail wurde an ' + payload.email + ' gesendet.';
         form.reset();
         buildTimeOptions();
-        // Direkt sichtbar für den Admin, ohne Neu-Login/Reload – siehe loadBookings unten.
         if (kalenderTabBtn && !kalenderTabBtn.hidden) loadBookings();
       })
       .catch(function (err) {
@@ -135,10 +166,10 @@
       });
   });
 
-  // --- Tabs: "Buchungen" ist immer Standard, "Kalender" taucht nur für
+  // --- Haupt-Tabs: "Buchungen" ist immer Standard, "Kalender" taucht nur für
   // eingeloggte Admins überhaupt als Tab auf. Beim Wechsel auf "Kalender"
-  // wird jedes Mal neu geladen, damit auch frisch eingegangene Termine
-  // sofort sichtbar sind (kein erneuter Login nötig). ---
+  // wird jedes Mal neu geladen, damit frisch eingegangene Termine sofort
+  // sichtbar sind (kein erneuter Login nötig). ---
   var tabs = document.querySelectorAll('.booking-tab');
   var panels = document.querySelectorAll('.booking-panel');
 
@@ -156,26 +187,27 @@
     tab.addEventListener('click', function () { activateTab(tab.dataset.tab); });
   });
 
-  // --- Admin: echter Monats-Kalender statt Liste ---
+  // --- Admin-Kalender: Monatsansicht (Tage als Kästen mit Terminanzahl) und
+  // Wochenansicht (echtes Zeitraster wie bei Google/Microsoft Calendar). ---
   var kalenderTabBtn = document.getElementById('tab-kalender-btn');
-  var monthLabel = document.getElementById('cal-month-label');
+  var calLabel = document.getElementById('cal-label');
+  var monthViewEl = document.getElementById('cal-month-view');
+  var weekViewEl = document.getElementById('cal-week-view');
   var gridEl = document.getElementById('cal-grid');
   var detailEl = document.getElementById('cal-day-detail');
   var prevBtn = document.getElementById('cal-prev');
   var nextBtn = document.getElementById('cal-next');
+  var viewToggleBtns = document.querySelectorAll('.view-toggle-btn');
 
   var MONTH_NAMES = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-  var bookingsByDate = {};
-  var viewDate = new Date();
-  viewDate.setDate(1);
-  var selectedDate = formatDate(new Date());
+  var WEEKDAY_SHORT = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+  var HOUR_HEIGHT = 56; // px pro Stunde in der Wochenansicht
 
-  function formatDate(d) {
-    var y = d.getFullYear();
-    var m = String(d.getMonth() + 1).padStart(2, '0');
-    var day = String(d.getDate()).padStart(2, '0');
-    return y + '-' + m + '-' + day;
-  }
+  var bookingsByDate = {};
+  var currentView = 'monat';
+  var viewDate = new Date();
+  viewDate.setHours(0, 0, 0, 0);
+  var selectedDate = formatDate(new Date());
 
   function renderDayDetail(dateStr) {
     selectedDate = dateStr;
@@ -186,15 +218,15 @@
     }
     var rows = items
       .map(function (b) {
-        var note = b.note ? '<br><em>' + b.note + '</em>' : '';
-        return '<li><strong>' + b.time + '</strong> – ' + b.name + ' (' + b.email + ')' + note + '</li>';
+        var note = b.note ? '<br><em>' + escapeHtml(b.note) + '</em>' : '';
+        return '<li><strong>' + escapeHtml(b.time) + '</strong> – ' + escapeHtml(b.name) + ' (' + escapeHtml(b.email) + ')' + note + '</li>';
       })
       .join('');
     detailEl.innerHTML = '<h4>' + dateStr + '</h4><ul>' + rows + '</ul>';
   }
 
-  function renderCalendarGrid() {
-    monthLabel.textContent = MONTH_NAMES[viewDate.getMonth()] + ' ' + viewDate.getFullYear();
+  function renderMonthView() {
+    calLabel.textContent = MONTH_NAMES[viewDate.getMonth()] + ' ' + viewDate.getFullYear();
     gridEl.innerHTML = '';
 
     var firstOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1);
@@ -231,13 +263,120 @@
     renderDayDetail(selectedDate);
   }
 
+  function getWeekStart(d) {
+    var date = new Date(d);
+    var day = (date.getDay() + 6) % 7; // Montag = 0
+    date.setDate(date.getDate() - day);
+    return date;
+  }
+
+  function computeHourRange(bookings) {
+    var startHour = 8;
+    var endHour = 18;
+    bookings.forEach(function (b) {
+      var h = parseInt(b.time.split(':')[0], 10);
+      if (!isNaN(h)) {
+        if (h < startHour) startHour = h;
+        if (h + 1 > endHour) endHour = h + 1;
+      }
+    });
+    return { startHour: Math.max(0, startHour), endHour: Math.min(24, endHour) };
+  }
+
+  function renderWeekView() {
+    var weekStart = getWeekStart(viewDate);
+    var weekDays = [];
+    for (var i = 0; i < 7; i += 1) {
+      var d = new Date(weekStart);
+      d.setDate(d.getDate() + i);
+      weekDays.push(d);
+    }
+    var weekEnd = weekDays[6];
+    calLabel.textContent = weekStart.getDate() + '.' + (weekStart.getMonth() + 1) + '. – ' + weekEnd.getDate() + '.' + (weekEnd.getMonth() + 1) + '.' + weekEnd.getFullYear();
+
+    var weekBookings = [];
+    weekDays.forEach(function (d) {
+      (bookingsByDate[formatDate(d)] || []).forEach(function (b) { weekBookings.push(b); });
+    });
+    var range = computeHourRange(weekBookings);
+    var totalHeight = (range.endHour - range.startHour) * HOUR_HEIGHT;
+    var todayStr = formatDate(new Date());
+
+    var html = '<div class="week-header">';
+    html += '<div class="week-gutter-cell"></div>';
+    weekDays.forEach(function (d) {
+      var isToday = formatDate(d) === todayStr;
+      html += '<div class="week-day-label' + (isToday ? ' is-today' : '') + '">' + WEEKDAY_SHORT[(d.getDay() + 6) % 7] + ' <strong>' + d.getDate() + '.' + (d.getMonth() + 1) + '.</strong></div>';
+    });
+    html += '</div>';
+
+    html += '<div class="week-body" style="height:' + totalHeight + 'px;">';
+    html += '<div class="week-gutter">';
+    for (var h = range.startHour; h < range.endHour; h += 1) {
+      html += '<div class="week-hour-label" style="height:' + HOUR_HEIGHT + 'px;">' + String(h).padStart(2, '0') + ':00</div>';
+    }
+    html += '</div>';
+
+    weekDays.forEach(function (d) {
+      var dateStr = formatDate(d);
+      html += '<div class="week-day-col">';
+      for (var h2 = range.startHour; h2 < range.endHour; h2 += 1) {
+        html += '<div class="week-hour-line" style="height:' + HOUR_HEIGHT + 'px;"></div>';
+      }
+      (bookingsByDate[dateStr] || []).forEach(function (b) {
+        var parts = b.time.split(':');
+        var minutesFromStart = (parseInt(parts[0], 10) - range.startHour) * 60 + (parseInt(parts[1], 10) || 0);
+        var top = (minutesFromStart / 60) * HOUR_HEIGHT;
+        var eventHeight = Math.max(26, HOUR_HEIGHT * 0.65);
+        html += '<div class="week-event" style="top:' + top + 'px; height:' + eventHeight + 'px;" title="' + escapeHtml(b.name) + ' (' + escapeHtml(b.email) + ')">' +
+          '<strong>' + escapeHtml(b.time) + '</strong> ' + escapeHtml(b.name) +
+          '</div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+
+    weekViewEl.innerHTML = html;
+  }
+
+  function renderCalendar() {
+    if (currentView === 'woche') {
+      monthViewEl.hidden = true;
+      weekViewEl.hidden = false;
+      detailEl.hidden = true;
+      renderWeekView();
+    } else {
+      monthViewEl.hidden = false;
+      weekViewEl.hidden = true;
+      detailEl.hidden = false;
+      renderMonthView();
+    }
+  }
+
+  viewToggleBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      viewToggleBtns.forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentView = btn.dataset.view;
+      renderCalendar();
+    });
+  });
+
   prevBtn.addEventListener('click', function () {
-    viewDate.setMonth(viewDate.getMonth() - 1);
-    renderCalendarGrid();
+    if (currentView === 'woche') {
+      viewDate.setDate(viewDate.getDate() - 7);
+    } else {
+      viewDate.setMonth(viewDate.getMonth() - 1);
+    }
+    renderCalendar();
   });
   nextBtn.addEventListener('click', function () {
-    viewDate.setMonth(viewDate.getMonth() + 1);
-    renderCalendarGrid();
+    if (currentView === 'woche') {
+      viewDate.setDate(viewDate.getDate() + 7);
+    } else {
+      viewDate.setMonth(viewDate.getMonth() + 1);
+    }
+    renderCalendar();
   });
 
   function loadBookings() {
@@ -248,7 +387,7 @@
         (data.bookings || []).forEach(function (b) {
           (bookingsByDate[b.date] = bookingsByDate[b.date] || []).push(b);
         });
-        renderCalendarGrid();
+        renderCalendar();
       });
   }
 

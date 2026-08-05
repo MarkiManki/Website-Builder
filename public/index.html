@@ -295,6 +295,20 @@
           </select>
         </label>
       </div>
+      <div class="image-picker" data-orientation="portrait">
+        <label class="image-picker-label">Bild neben dem Buchungsformular</label>
+        <div class="image-picker-controls">
+          <input type="text" class="image-picker-query" placeholder="Suchbegriff, z. B. calendar appointment">
+          <button type="button" class="image-picker-search">Bilder laden</button>
+        </div>
+        <div class="image-picker-grid"></div>
+        <button type="button" class="image-picker-more" hidden>Weitere Vorschläge laden</button>
+        <label class="image-picker-upload">
+          oder eigenes Bild hochladen
+          <input type="file" accept="image/*" class="image-picker-file">
+        </label>
+        <input type="hidden" class="image-picker-value" name="design.images.buchungen">
+      </div>
       <p class="hint">
         Auf der Buchungsseite kann dann nur noch eine Uhrzeit im gewählten Zeitraum und Raster gewählt werden.
       </p>
