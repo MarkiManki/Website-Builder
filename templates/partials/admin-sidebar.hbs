@@ -1,3 +1,11 @@
+<script>
+  // Statische Leistungen aus dem Website-Builder-Formular, global verfügbar
+  // (die Sidebar ist auf jeder Seite im DOM) – damit kann admin.js den
+  // Server-Speicher genauso "seeden" wie es templates/pages/leistungen.hbs
+  // beim Laden der öffentlichen Seite tut, unabhängig davon, ob die
+  // Leistungen-Seite selbst schon einmal aufgerufen wurde.
+  window.__staticLeistungen = {{{json content.leistungen.services}}} || [];
+</script>
 <div class="admin-sidebar-backdrop" id="admin-sidebar-backdrop"></div>
 <aside class="admin-sidebar" id="admin-sidebar" aria-hidden="true">
   <div class="admin-sidebar-head">

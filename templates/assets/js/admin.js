@@ -559,7 +559,26 @@ window.AdminPanel = (function () {
     }
 
     function loadServicesAdmin() {
-      fetch('/api/services')
+      // Seed-Endpoint statt einfachem GET: seedIfEmpty() liefert die
+      // bestehenden Leistungen unverändert zurück, falls schon welche im
+      // Server-Speicher sind (z. B. durch Admin-Bearbeitung), und seedet
+      // andernfalls aus den im Builder eingetragenen Leistungen – genau wie
+      // die öffentliche Leistungen-Seite es beim eigenen Laden tut. So sieht
+      // man hier auch etwas, wenn die Leistungen-Seite selbst noch nie
+      // aufgerufen wurde.
+      var seedPayload = (window.__staticLeistungen || []).map(function (s) {
+        return {
+          name: s.name || '',
+          description: s.description || '',
+          price: '',
+          image: (s.image && s.image.src) || '',
+        };
+      });
+      fetch('/api/services/seed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ services: seedPayload }),
+      })
         .then(function (res) { return res.json(); })
         .then(function (data) {
           servicesAdminListEl.innerHTML = '';
