@@ -131,15 +131,31 @@
     if (adminSidebarBackdrop) adminSidebarBackdrop.classList.remove('is-open');
   }
 
+  // Jede Seite ist ein eigener Ladevorgang (Mehrseiten-Website), der Button
+  // startet im HTML deshalb immer statisch mit "Anmelden" (siehe header.hbs)
+  // und wird erst nach dem asynchronen /api/session-Aufruf korrigiert – das
+  // erzeugte beim Seitenwechsel ein kurzes Umspringen. Der zuletzt bekannte
+  // Login-Status wird deshalb sofort (synchron, vor jedem Netzwerk-Request)
+  // aus localStorage übernommen; /api/session bleibt die Quelle der Wahrheit
+  // und korrigiert falls nötig (z. B. abgelaufene Session).
+  function applyAdminState(isAdmin) {
+    isAdminSession = isAdmin;
+    cornerBtn.textContent = isAdmin ? 'Verwaltung' : 'Anmelden';
+    cornerBtn.classList.toggle('is-logged-in', isAdmin);
+    try { window.localStorage.setItem('wb-admin-session', isAdmin ? '1' : '0'); } catch (err) {}
+  }
+
+  if (cornerBtn) {
+    try {
+      if (window.localStorage.getItem('wb-admin-session') === '1') applyAdminState(true);
+    } catch (err) {}
+  }
+
   function checkNavSession() {
     if (!cornerBtn) return;
     fetch('/api/session')
       .then(function (res) { return res.json(); })
-      .then(function (data) {
-        isAdminSession = !!data.isAdmin;
-        cornerBtn.textContent = isAdminSession ? 'Verwaltung' : 'Anmelden';
-        cornerBtn.classList.toggle('is-logged-in', isAdminSession);
-      })
+      .then(function (data) { applyAdminState(!!data.isAdmin); })
       .catch(function () {});
   }
 
@@ -162,6 +178,7 @@
   if (adminSidebarLogout) {
     adminSidebarLogout.addEventListener('click', function () {
       fetch('/api/logout', { method: 'POST' }).then(function () {
+        try { window.localStorage.setItem('wb-admin-session', '0'); } catch (err) {}
         window.location.reload();
       });
     });
@@ -178,6 +195,7 @@
       })
         .then(function (res) {
           if (!res.ok) throw new Error('Benutzername/E-Mail oder Passwort falsch.');
+          try { window.localStorage.setItem('wb-admin-session', '1'); } catch (err) {}
           window.location.reload();
         })
         .catch(function (err) {

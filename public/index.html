@@ -32,8 +32,14 @@
   <div class="builder-layout">
   <form id="builder-form" class="form-col">
 
-    <section class="panel">
-      <h2>1. Unternehmensdaten</h2>
+    <section class="panel wizard-step" data-step-id="unternehmen">
+      <button type="button" class="wizard-step-header">
+        <span class="wizard-step-number">1</span>
+        <span class="wizard-step-title">Unternehmensdaten</span>
+        <span class="wizard-status wizard-status-required">Pflicht</span>
+        <span class="wizard-step-chevron" aria-hidden="true">⌄</span>
+      </button>
+      <div class="wizard-step-body">
       <div class="grid-2">
         <label>Name / Firma*
           <input type="text" name="business.name" required placeholder="z. B. Max Mustermann Fotografie">
@@ -114,25 +120,35 @@
           </label>
         </div>
       </div>
+      <div class="wizard-step-nav">
+        <button type="button" class="btn-primary-lg wizard-nav-btn wizard-next">Weiter →</button>
+      </div>
+      </div>
     </section>
 
-    <section class="panel">
-      <h2>2. Welche Seiten soll die Website haben?</h2>
+    <section class="panel wizard-step" data-step-id="seiten">
+      <button type="button" class="wizard-step-header">
+        <span class="wizard-step-number">2</span>
+        <span class="wizard-step-title">Welche Seiten soll die Website haben?</span>
+        <span class="wizard-status wizard-status-required">Pflicht</span>
+        <span class="wizard-step-chevron" aria-hidden="true">⌄</span>
+      </button>
+      <div class="wizard-step-body">
       <div class="page-choice" id="page-choice">
         <label class="page-item">
           <input type="checkbox" name="pages.home" checked disabled>
           Startseite (Home) <span class="badge badge-required">Pflicht</span>
         </label>
         <label class="page-item">
-          <input type="checkbox" name="pages.ueberUns" data-toggle="section-ueberUns">
+          <input type="checkbox" name="pages.ueberUns">
           Über uns / Team
         </label>
         <label class="page-item">
-          <input type="checkbox" name="pages.leistungen" data-toggle="section-leistungen">
+          <input type="checkbox" name="pages.leistungen">
           Leistungen / Portfolio
         </label>
         <label class="page-item">
-          <input type="checkbox" name="pages.buchungen" data-toggle="section-buchungen" checked>
+          <input type="checkbox" name="pages.buchungen" checked>
           Buchungen
         </label>
         <label class="page-item disabled">
@@ -148,7 +164,7 @@
           Blog / News <span class="badge badge-soon">demnächst</span>
         </label>
         <label class="page-item">
-          <input type="checkbox" name="pages.kontakt" data-toggle="section-kontakt">
+          <input type="checkbox" name="pages.kontakt">
           Kontakt & Anfahrt
         </label>
         <label class="page-item">
@@ -156,10 +172,21 @@
           Impressum <span class="badge badge-required">Pflicht</span>
         </label>
       </div>
+      <div class="wizard-step-nav">
+        <button type="button" class="btn-secondary-lg wizard-nav-btn wizard-prev">← Zurück</button>
+        <button type="button" class="btn-primary-lg wizard-nav-btn wizard-next">Weiter →</button>
+      </div>
+      </div>
     </section>
 
-    <section class="panel">
-      <h2>3. Inhalte: Startseite</h2>
+    <section class="panel wizard-step" data-step-id="home">
+      <button type="button" class="wizard-step-header">
+        <span class="wizard-step-number">3</span>
+        <span class="wizard-step-title">Inhalte: Startseite</span>
+        <span class="wizard-status wizard-status-required">Pflicht</span>
+        <span class="wizard-step-chevron" aria-hidden="true">⌄</span>
+      </button>
+      <div class="wizard-step-body">
       <div class="grid-2">
         <label class="span-2">Überschrift*
           <input type="text" name="content.home.headline" required placeholder="z. B. Willkommen bei Mustermann Fotografie">
@@ -202,10 +229,25 @@
         </label>
         <input type="hidden" class="image-picker-value" name="design.images.cta">
       </div>
+      <div class="wizard-step-nav">
+        <button type="button" class="btn-secondary-lg wizard-nav-btn wizard-prev">← Zurück</button>
+        <button type="button" class="btn-primary-lg wizard-nav-btn wizard-next">Weiter →</button>
+      </div>
+      </div>
     </section>
 
-    <section class="panel section-toggle" id="section-ueberUns" hidden>
-      <h2>Inhalte: Über uns / Team</h2>
+    <section class="panel wizard-step" data-step-id="ueberUns" data-page-checkbox="pages.ueberUns">
+      <button type="button" class="wizard-step-header">
+        <span class="wizard-step-number">4</span>
+        <span class="wizard-step-title">Inhalte: Über uns / Team</span>
+        <span class="wizard-status" data-status-for="pages.ueberUns"></span>
+        <span class="wizard-step-chevron" aria-hidden="true">⌄</span>
+      </button>
+      <div class="wizard-step-body">
+      <p class="wizard-skip-banner" data-skip-banner-for="pages.ueberUns" hidden>
+        Diese Seite ist aktuell nicht ausgewählt und wird nicht mit generiert.
+        <button type="button" class="wizard-enable-btn" data-enable-page="pages.ueberUns">Seite hinzufügen</button>
+      </p>
       <div class="grid-2">
         <label class="span-2">Titel
           <input type="text" name="content.ueberUns.title" value="Über uns">
@@ -231,10 +273,25 @@
       <h3>Team-Mitglieder</h3>
       <div id="team-members" class="repeat-list"></div>
       <button type="button" class="btn-add" data-add="team-members" data-template="team-member-template">+ Teammitglied hinzufügen</button>
+      <div class="wizard-step-nav">
+        <button type="button" class="btn-secondary-lg wizard-nav-btn wizard-prev">← Zurück</button>
+        <button type="button" class="btn-primary-lg wizard-nav-btn wizard-next">Weiter →</button>
+      </div>
+      </div>
     </section>
 
-    <section class="panel section-toggle" id="section-leistungen" hidden>
-      <h2>Inhalte: Leistungen / Portfolio</h2>
+    <section class="panel wizard-step" data-step-id="leistungen" data-page-checkbox="pages.leistungen">
+      <button type="button" class="wizard-step-header">
+        <span class="wizard-step-number">5</span>
+        <span class="wizard-step-title">Inhalte: Leistungen / Portfolio</span>
+        <span class="wizard-status" data-status-for="pages.leistungen"></span>
+        <span class="wizard-step-chevron" aria-hidden="true">⌄</span>
+      </button>
+      <div class="wizard-step-body">
+      <p class="wizard-skip-banner" data-skip-banner-for="pages.leistungen" hidden>
+        Diese Seite ist aktuell nicht ausgewählt und wird nicht mit generiert.
+        <button type="button" class="wizard-enable-btn" data-enable-page="pages.leistungen">Seite hinzufügen</button>
+      </p>
       <div class="grid-2">
         <label class="span-2">Titel
           <input type="text" name="content.leistungen.title" value="Unsere Leistungen">
@@ -260,10 +317,25 @@
       <h3>Leistungen</h3>
       <div id="services" class="repeat-list"></div>
       <button type="button" class="btn-add" data-add="services" data-template="service-template">+ Leistung hinzufügen</button>
+      <div class="wizard-step-nav">
+        <button type="button" class="btn-secondary-lg wizard-nav-btn wizard-prev">← Zurück</button>
+        <button type="button" class="btn-primary-lg wizard-nav-btn wizard-next">Weiter →</button>
+      </div>
+      </div>
     </section>
 
-    <section class="panel section-toggle" id="section-kontakt" hidden>
-      <h2>Inhalte: Kontakt & Anfahrt</h2>
+    <section class="panel wizard-step" data-step-id="kontakt" data-page-checkbox="pages.kontakt">
+      <button type="button" class="wizard-step-header">
+        <span class="wizard-step-number">6</span>
+        <span class="wizard-step-title">Inhalte: Kontakt &amp; Anfahrt</span>
+        <span class="wizard-status" data-status-for="pages.kontakt"></span>
+        <span class="wizard-step-chevron" aria-hidden="true">⌄</span>
+      </button>
+      <div class="wizard-step-body">
+      <p class="wizard-skip-banner" data-skip-banner-for="pages.kontakt" hidden>
+        Diese Seite ist aktuell nicht ausgewählt und wird nicht mit generiert.
+        <button type="button" class="wizard-enable-btn" data-enable-page="pages.kontakt">Seite hinzufügen</button>
+      </p>
       <div class="grid-2">
         <label class="span-2">Titel
           <input type="text" name="content.kontakt.title" value="Kontakt">
@@ -276,10 +348,25 @@
         </label>
       </div>
       <p class="hint">Adresse, Telefon und E-Mail werden aus Schritt 2 übernommen.</p>
+      <div class="wizard-step-nav">
+        <button type="button" class="btn-secondary-lg wizard-nav-btn wizard-prev">← Zurück</button>
+        <button type="button" class="btn-primary-lg wizard-nav-btn wizard-next">Weiter →</button>
+      </div>
+      </div>
     </section>
 
-    <section class="panel section-toggle" id="section-buchungen">
-      <h2>Inhalte: Buchungen</h2>
+    <section class="panel wizard-step" data-step-id="buchungen" data-page-checkbox="pages.buchungen">
+      <button type="button" class="wizard-step-header">
+        <span class="wizard-step-number">7</span>
+        <span class="wizard-step-title">Inhalte: Buchungen</span>
+        <span class="wizard-status" data-status-for="pages.buchungen"></span>
+        <span class="wizard-step-chevron" aria-hidden="true">⌄</span>
+      </button>
+      <div class="wizard-step-body">
+      <p class="wizard-skip-banner" data-skip-banner-for="pages.buchungen" hidden>
+        Diese Seite ist aktuell nicht ausgewählt und wird nicht mit generiert.
+        <button type="button" class="wizard-enable-btn" data-enable-page="pages.buchungen">Seite hinzufügen</button>
+      </p>
       <div class="grid-2">
         <label class="span-2">Titel
           <input type="text" name="content.buchungen.title" value="Termin buchen">
@@ -323,10 +410,21 @@
         aus diesem Tool aufgerufen wird (nicht im reinen ZIP-Export auf fremdem Hosting).
         Admin-Login zum Testen: <strong>admin</strong> / <strong>admin</strong>.
       </p>
+      <div class="wizard-step-nav">
+        <button type="button" class="btn-secondary-lg wizard-nav-btn wizard-prev">← Zurück</button>
+        <button type="button" class="btn-primary-lg wizard-nav-btn wizard-next">Weiter →</button>
+      </div>
+      </div>
     </section>
 
-    <section class="panel">
-      <h2>4. Impressum <span class="badge badge-required">Pflicht</span></h2>
+    <section class="panel wizard-step" data-step-id="impressum">
+      <button type="button" class="wizard-step-header">
+        <span class="wizard-step-number">8</span>
+        <span class="wizard-step-title">Impressum</span>
+        <span class="wizard-status wizard-status-required">Pflicht</span>
+        <span class="wizard-step-chevron" aria-hidden="true">⌄</span>
+      </button>
+      <div class="wizard-step-body">
       <p class="hint">Rechtlich notwendige Angaben. Bitte im Zweifel juristisch prüfen lassen.</p>
       <div class="grid-2">
         <label>Inhaber / Verantwortliche Person*
@@ -362,6 +460,10 @@
         <label class="span-2">Verantwortlich für den Inhalt (§ 55 Abs. 2 RStV)
           <input type="text" name="content.impressum.verantwortlicher" placeholder="Name, Anschrift">
         </label>
+      </div>
+      <div class="wizard-step-nav">
+        <button type="button" class="btn-secondary-lg wizard-nav-btn wizard-prev">← Zurück</button>
+      </div>
       </div>
     </section>
 

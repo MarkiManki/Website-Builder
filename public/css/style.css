@@ -181,6 +181,155 @@ body {
   margin-bottom: 0.6rem;
 }
 
+/* ---------- Schritt-für-Schritt-Assistent ----------
+   Jedes .panel ist zugleich ein .wizard-step: Kopfzeile bleibt immer
+   sichtbar (Nummer/Titel/Status), der Inhalt klappt darunter auf/zu. Die
+   Kopfzeile war vorher ein <h2>, jetzt ein Button mit derselben Optik. */
+.wizard-step {
+  padding: 1.75rem;
+}
+
+.wizard-step-header {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+
+.wizard-step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  background: #eef1f6;
+  color: #1f2430;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.wizard-step.is-open .wizard-step-number {
+  background: #ff6b4a;
+  color: #fff;
+}
+
+.wizard-step-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  flex: 1;
+}
+
+.wizard-status {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.wizard-status-required {
+  background: #e6f0ff;
+  color: #1d4ed8;
+}
+
+.wizard-status-included {
+  background: #e7f7ee;
+  color: #15803d;
+}
+
+.wizard-status-skipped {
+  background: #f0f1f3;
+  color: #8a8f99;
+}
+
+.wizard-step-chevron {
+  font-size: 1.1rem;
+  line-height: 1;
+  color: #9aa0ab;
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+
+.wizard-step.is-open .wizard-step-chevron {
+  transform: rotate(180deg);
+}
+
+.wizard-step.is-skipped .wizard-step-header {
+  opacity: 0.65;
+}
+
+/* max-height statt [hidden]/display:none: Felder bleiben für die native
+   Formular-Validierung "gerendert", nur optisch eingeklappt (siehe form.js,
+   invalid-Event-Listener, der einen Schritt bei Bedarf trotzdem aufklappt). */
+.wizard-step-body {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.35s ease, opacity 0.25s ease, margin-top 0.35s ease;
+}
+
+.wizard-step.is-open .wizard-step-body {
+  max-height: 4000px;
+  opacity: 1;
+  margin-top: 1.5rem;
+}
+
+.wizard-step-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #e3e5ea;
+}
+
+.wizard-step-nav .wizard-next {
+  margin-left: auto;
+}
+
+.wizard-skip-banner[hidden] {
+  display: none;
+}
+
+.wizard-skip-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  background: #fff8f0;
+  border: 1px solid #f2d9b8;
+  color: #8a5a1f;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  margin-bottom: 1.25rem;
+}
+
+.wizard-enable-btn {
+  background: #1f2430;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
 .hint {
   color: #6b7280;
   font-size: 0.9rem;

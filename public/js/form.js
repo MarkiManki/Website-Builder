@@ -53,11 +53,90 @@
     })
     .catch((err) => console.error('Branchenliste konnte nicht geladen werden:', err));
 
-  // --- Bedingte Abschnitte ein-/ausblenden, wenn eine Seite an-/abgewählt wird ---
-  document.querySelectorAll('[data-toggle]').forEach((checkbox) => {
-    const target = document.getElementById(checkbox.dataset.toggle);
-    checkbox.addEventListener('change', () => {
-      if (target) target.hidden = !checkbox.checked;
+  // --- Schritt-für-Schritt-Assistent: Bereiche sind einzeln auf-/zuklappbar
+  // statt alle gleichzeitig ausgeklappt, Reihenfolge = DOM-Reihenfolge der
+  // .wizard-step-Sektionen. Start-/Impressum-Schritt sind immer Pflicht und
+  // haben keinen Überspringen-Status. ---
+  const wizardSteps = Array.from(document.querySelectorAll('.wizard-step'));
+
+  function openStep(step, opts) {
+    wizardSteps.forEach((s) => s.classList.toggle('is-open', s === step));
+    if (!opts || opts.scroll !== false) {
+      step.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  wizardSteps.forEach((step, index) => {
+    const header = step.querySelector('.wizard-step-header');
+    header.addEventListener('click', () => {
+      if (step.classList.contains('is-open')) {
+        step.classList.remove('is-open');
+      } else {
+        openStep(step, { scroll: false });
+      }
+    });
+
+    step.querySelectorAll('.wizard-next').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (wizardSteps[index + 1]) openStep(wizardSteps[index + 1]);
+      });
+    });
+    step.querySelectorAll('.wizard-prev').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (wizardSteps[index - 1]) openStep(wizardSteps[index - 1]);
+      });
+    });
+  });
+
+  if (wizardSteps[0]) wizardSteps[0].classList.add('is-open');
+
+  // Eingeklappte Schritte werden bewusst über max-height/overflow (siehe
+  // style.css) statt über [hidden] versteckt – Felder bleiben damit für die
+  // native Formular-Validierung "gerendert". Trotzdem sieht man eine
+  // Validierungsmeldung in einem zugeklappten Schritt nicht von selbst,
+  // daher hier automatisch aufklappen, sobald ein Feld als ungültig markiert wird.
+  form.addEventListener('invalid', (event) => {
+    const step = event.target.closest('.wizard-step');
+    if (step) openStep(step);
+  }, true);
+
+  // --- Optionale Seiten (Über uns/Leistungen/Kontakt/Buchungen): Status-Badge
+  // + "Diese Seite ist abgewählt"-Hinweis live an die jeweilige Checkbox aus
+  // Schritt 2 gekoppelt. Inhalte lassen sich unabhängig vom Status ausfüllen
+  // (schadet nichts – ohne Häkchen wird die Seite beim Generieren einfach
+  // nicht mit ausgegeben, siehe src/generator.js), man kann den Bereich also
+  // jederzeit einfach leer lassen und überspringen. ---
+  function updateOptionalStepStatus(checkboxName) {
+    const checkbox = form.elements[checkboxName];
+    const step = document.querySelector(`.wizard-step[data-page-checkbox="${checkboxName}"]`);
+    if (!checkbox || !step) return;
+    const isIncluded = checkbox.checked;
+    const statusEl = step.querySelector('.wizard-status');
+    if (statusEl) {
+      statusEl.textContent = isIncluded ? 'Enthalten' : 'Übersprungen';
+      statusEl.classList.toggle('wizard-status-included', isIncluded);
+      statusEl.classList.toggle('wizard-status-skipped', !isIncluded);
+    }
+    const banner = step.querySelector('.wizard-skip-banner');
+    if (banner) banner.hidden = isIncluded;
+    step.classList.toggle('is-skipped', !isIncluded);
+  }
+
+  Array.from(document.querySelectorAll('.wizard-step[data-page-checkbox]'))
+    .map((step) => step.dataset.pageCheckbox)
+    .forEach((name) => {
+      const checkbox = form.elements[name];
+      if (!checkbox) return;
+      checkbox.addEventListener('change', () => updateOptionalStepStatus(name));
+      updateOptionalStepStatus(name);
+    });
+
+  document.querySelectorAll('[data-enable-page]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const checkbox = form.elements[btn.dataset.enablePage];
+      if (!checkbox) return;
+      checkbox.checked = true;
+      checkbox.dispatchEvent(new Event('change', { bubbles: true }));
     });
   });
 
@@ -983,12 +1062,11 @@
     if (el) el.value = value;
   }
 
-  function checkAndReveal(checkboxName, sectionId) {
+  function checkAndReveal(checkboxName) {
     const checkbox = form.elements[checkboxName];
     if (!checkbox) return;
     checkbox.checked = true;
-    const section = document.getElementById(sectionId);
-    if (section) section.hidden = false;
+    updateOptionalStepStatus(checkboxName);
   }
 
   // Sucht ein zufälliges Vorschaubild bei Pexels (Suchbegriff je Sample-Set)
@@ -1105,19 +1183,19 @@
     setValue('content.home.ctaText', SAMPLE_DATA.home.ctaText);
     setValue('content.home.ctaLink', SAMPLE_DATA.home.ctaLink);
 
-    checkAndReveal('pages.ueberUns', 'section-ueberUns');
+    checkAndReveal('pages.ueberUns');
     setValue('content.ueberUns.title', SAMPLE_DATA.ueberUns.title);
     setValue('content.ueberUns.text', SAMPLE_DATA.ueberUns.text);
     document.getElementById('team-members').innerHTML = '';
     SAMPLE_DATA.ueberUns.team.forEach((member) => addRepeatRow('team-members', 'team-member-template', member));
 
-    checkAndReveal('pages.leistungen', 'section-leistungen');
+    checkAndReveal('pages.leistungen');
     setValue('content.leistungen.title', SAMPLE_DATA.leistungen.title);
     setValue('content.leistungen.intro', SAMPLE_DATA.leistungen.intro);
     document.getElementById('services').innerHTML = '';
     SAMPLE_DATA.leistungen.services.forEach((service) => addRepeatRow('services', 'service-template', service));
 
-    checkAndReveal('pages.kontakt', 'section-kontakt');
+    checkAndReveal('pages.kontakt');
     setValue('content.kontakt.title', SAMPLE_DATA.kontakt.title);
     setValue('content.kontakt.intro', SAMPLE_DATA.kontakt.intro);
     setValue('content.kontakt.openingHours', SAMPLE_DATA.kontakt.openingHours);
