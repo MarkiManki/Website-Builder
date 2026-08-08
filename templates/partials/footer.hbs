@@ -23,6 +23,16 @@
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.4 20.4h-3.5v-5.6c0-1.3-.5-2.3-1.8-2.3-1 0-1.6.7-1.9 1.3-.1.2-.1.6-.1.9v5.7H9.6s.1-9.3 0-10.3h3.5v1.5a3.5 3.5 0 0 1 3.1-1.7c2.3 0 4 1.5 4 4.7v5.8ZM7.8 8.6a2 2 0 1 1 0-4.1 2 2 0 0 1 0 4.1ZM6 20.4h3.5V10.1H6v10.3Z"/></svg>
           </a></li>
         {{/if}}
+        {{#if business.social.tiktok}}
+          <li><a href="{{business.social.tiktok}}" target="_blank" rel="noopener" aria-label="TikTok">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.5 3c.3 1.9 1.6 3.3 3.5 3.6v2.6c-1.3 0-2.5-.4-3.5-1.1v6.4a5.1 5.1 0 1 1-4.3-5v2.7a2.4 2.4 0 1 0 1.7 2.3V3h2.6Z"/></svg>
+          </a></li>
+        {{/if}}
+        {{#if business.social.youtube}}
+          <li><a href="{{business.social.youtube}}" target="_blank" rel="noopener" aria-label="YouTube">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4" stroke="currentColor" stroke-width="1.8"/><path d="M10 9l6 3-6 3V9Z" fill="currentColor"/></svg>
+          </a></li>
+        {{/if}}
       </ul>
       <ul class="footer-links">
         {{#each footerLinks}}

@@ -1,0 +1,107 @@
+<div class="admin-sidebar-backdrop" id="admin-sidebar-backdrop"></div>
+<aside class="admin-sidebar" id="admin-sidebar" aria-hidden="true">
+  <div class="admin-sidebar-head">
+    <div class="admin-sidebar-header">
+      <h2>Verwaltung</h2>
+      <div class="admin-sidebar-header-actions">
+        <button type="button" id="admin-sidebar-logout" class="admin-sidebar-logout-btn">Abmelden</button>
+        <button type="button" id="admin-sidebar-close" class="admin-sidebar-close" aria-label="Verwaltung schließen">✕</button>
+      </div>
+    </div>
+
+    <div class="admin-subtabs">
+      <button type="button" class="admin-subtab active" data-subtab="kalender">Kalender</button>
+      <button type="button" class="admin-subtab" data-subtab="anfragen">Anfragen<span id="anfragen-badge" class="subtab-badge" hidden>0</span></button>
+      <button type="button" class="admin-subtab" data-subtab="oeffnungszeiten">Öffnungszeiten</button>
+      <button type="button" class="admin-subtab" data-subtab="leistungen">Leistungen</button>
+    </div>
+  </div>
+
+  <div class="admin-sidebar-body">
+  <div class="admin-subpanel" data-subpanel="kalender">
+    <div class="calendar">
+      <div class="calendar-header">
+        <div class="calendar-nav">
+          <button type="button" id="cal-prev" aria-label="Zurück">‹</button>
+          <h3 id="cal-label"></h3>
+          <button type="button" id="cal-next" aria-label="Weiter">›</button>
+        </div>
+        <div class="calendar-view-toggle">
+          <button type="button" class="view-toggle-btn" data-view="monat">Monat</button>
+          <button type="button" class="view-toggle-btn active" data-view="woche">Woche</button>
+        </div>
+      </div>
+
+      <div class="calendar-month-view" id="cal-month-view" hidden>
+        <div class="calendar-weekdays">
+          <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+        </div>
+        <div class="calendar-grid" id="cal-grid"></div>
+      </div>
+
+      <div class="calendar-week-view" id="cal-week-view"></div>
+      <p class="hint calendar-hint">Klicken Sie auf einen freien Zeitpunkt (Wochenansicht) oder auf "+ Termin eintragen" (Tagesdetail), um selbst einen Termin einzutragen – z. B. nach einem Telefonanruf.</p>
+    </div>
+
+    <div class="calendar-day-detail" id="cal-day-detail" hidden>
+      <p class="hint">Tag im Kalender auswählen, um die Termine zu sehen.</p>
+    </div>
+  </div>
+
+  <div class="admin-subpanel" data-subpanel="anfragen" hidden>
+    <div id="anfragen-list">
+      <p class="hint">Keine offenen Anfragen.</p>
+    </div>
+  </div>
+
+  <div class="admin-subpanel" data-subpanel="oeffnungszeiten" hidden>
+    <form id="settings-form" class="settings-form">
+      <div class="settings-days" id="settings-days"></div>
+      <label class="settings-interval-label">Zeitraster (für alle Tage)
+        <select name="slotInterval" id="settings-interval">
+          <option value="15">Alle 15 Minuten</option>
+          <option value="30">Alle 30 Minuten</option>
+          <option value="60">Jede volle Stunde</option>
+        </select>
+      </label>
+      <button type="submit" class="btn btn-primary">Öffnungszeiten speichern</button>
+      <p id="settings-status" class="booking-status" hidden></p>
+    </form>
+  </div>
+
+  <div class="admin-subpanel" data-subpanel="leistungen" hidden>
+    <div id="services-admin-list" class="services-admin-list"></div>
+    <button type="button" id="add-service-btn" class="btn-add">+ Leistung hinzufügen</button>
+  </div>
+  </div>
+</aside>
+
+<div class="admin-modal-backdrop" id="admin-modal-backdrop" hidden>
+  <div class="admin-modal">
+    <h3>Termin eintragen</h3>
+    <form id="admin-booking-form">
+      <label>Name*
+        <input type="text" name="name" required>
+      </label>
+      <label>E-Mail (optional)
+        <input type="email" name="email">
+      </label>
+      <div class="grid-2-site">
+        <label>Datum*
+          <input type="date" name="date" required>
+        </label>
+        <label>Uhrzeit*
+          <input type="time" name="time" required>
+        </label>
+      </div>
+      <label>Notiz (optional)
+        <textarea name="note" rows="2"></textarea>
+      </label>
+      <div class="admin-modal-actions">
+        <button type="button" id="admin-modal-cancel" class="btn btn-secondary">Abbrechen</button>
+        <button type="submit" class="btn btn-primary">Termin eintragen</button>
+      </div>
+      <p id="admin-modal-status" class="booking-status" hidden></p>
+    </form>
+  </div>
+</div>

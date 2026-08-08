@@ -12,7 +12,7 @@
 
 <section class="section section-muted reveal">
   <div class="container">
-    <div class="card-grid">
+    <div class="card-grid" id="services-grid">
       {{#each content.leistungen.services}}
         <div class="card service-card">
           {{#if this.image}}
@@ -27,3 +27,51 @@
     </div>
   </div>
 </section>
+
+<script>
+(function () {
+  function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+
+  // Beim ersten Laden mit den im Builder eingetragenen Leistungen vorbelegen
+  // (nur wirksam, falls der Admin noch keine eigenen Leistungen im
+  // Verwaltungs-Panel angelegt/geändert hat – siehe seedIfEmpty im Backend).
+  var staticServices = {{{json content.leistungen.services}}} || [];
+  var seedPayload = staticServices.map(function (s) {
+    return {
+      name: s.name || '',
+      description: s.description || '',
+      price: '',
+      image: (s.image && s.image.src) || '',
+    };
+  });
+
+  var gridEl = document.getElementById('services-grid');
+
+  function renderServices(services) {
+    if (!services.length) return;
+    gridEl.innerHTML = services.map(function (s) {
+      var media = s.image
+        ? '<div class="card-media"><img src="' + escapeHtml(s.image) + '" alt="' + escapeHtml(s.name) + '" loading="lazy"></div>'
+        : '';
+      var price = s.price ? '<span class="service-price">' + escapeHtml(s.price) + '</span>' : '';
+      return '<div class="card service-card">' + media +
+        '<h3>' + escapeHtml(s.name) + price + '</h3>' +
+        '<p>' + escapeHtml(s.description) + '</p>' +
+        '</div>';
+    }).join('');
+  }
+
+  fetch('/api/services/seed', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ services: seedPayload }),
+  })
+    .then(function (res) { return res.json(); })
+    .then(function (data) { renderServices(data.services || []); })
+    .catch(function () {});
+})();
+</script>

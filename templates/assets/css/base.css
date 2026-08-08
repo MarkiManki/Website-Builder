@@ -142,13 +142,22 @@ a:hover { text-decoration: underline; }
    siehe oben). Für die Hero-Höhenrechnung (100vh - Topbar) zählt trotzdem
    nur der große, ungescrollte --topbar-height, sonst würde der Hero beim
    Scrollen selbst mitspringen. */
+/* Mehrere weiche, unterschiedlich helle/dunkle Töne derselben Farbe
+   (--primary) überlagern die ursprüngliche Diagonale – wirkt dadurch wie ein
+   fließender, wellenartiger Verlauf statt einer einzigen flachen Linie, ohne
+   den Farbton selbst zu wechseln (funktioniert mit jeder gewählten Farbe). */
 .site-topbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 40;
-  background: linear-gradient(120deg, color-mix(in srgb, var(--primary) 95%, black) 0%, color-mix(in srgb, var(--primary) 65%, black) 100%);
+  background:
+    radial-gradient(90% 160% at 8% -15%, color-mix(in srgb, var(--primary) 58%, white) 0%, transparent 55%),
+    radial-gradient(100% 180% at 42% 120%, color-mix(in srgb, var(--primary) 78%, black) 0%, transparent 60%),
+    radial-gradient(85% 160% at 78% -20%, color-mix(in srgb, var(--primary) 55%, white) 0%, transparent 55%),
+    radial-gradient(95% 180% at 100% 130%, color-mix(in srgb, var(--primary) 88%, black) 0%, transparent 60%),
+    linear-gradient(120deg, color-mix(in srgb, var(--primary) 95%, black) 0%, color-mix(in srgb, var(--primary) 65%, black) 100%);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
   transition: background 0.35s var(--ease), box-shadow 0.25s var(--ease), backdrop-filter 0.35s var(--ease);
 }
@@ -156,9 +165,14 @@ a:hover { text-decoration: underline; }
 /* Beim Scrollen: kleiner UND leicht transparent (Glass-Effekt), aber
    derselbe Farbton – kein Hue-Wechsel, nur reduzierte Deckkraft + Weichzeichner. */
 .site-topbar.is-scrolled {
-  background: linear-gradient(120deg,
-    color-mix(in srgb, color-mix(in srgb, var(--primary) 95%, black) 88%, transparent) 0%,
-    color-mix(in srgb, color-mix(in srgb, var(--primary) 65%, black) 88%, transparent) 100%);
+  background:
+    radial-gradient(90% 160% at 8% -15%, color-mix(in srgb, color-mix(in srgb, var(--primary) 58%, white) 88%, transparent) 0%, transparent 55%),
+    radial-gradient(100% 180% at 42% 120%, color-mix(in srgb, color-mix(in srgb, var(--primary) 78%, black) 88%, transparent) 0%, transparent 60%),
+    radial-gradient(85% 160% at 78% -20%, color-mix(in srgb, color-mix(in srgb, var(--primary) 55%, white) 88%, transparent) 0%, transparent 55%),
+    radial-gradient(95% 180% at 100% 130%, color-mix(in srgb, color-mix(in srgb, var(--primary) 88%, black) 88%, transparent) 0%, transparent 60%),
+    linear-gradient(120deg,
+      color-mix(in srgb, color-mix(in srgb, var(--primary) 95%, black) 88%, transparent) 0%,
+      color-mix(in srgb, color-mix(in srgb, var(--primary) 65%, black) 88%, transparent) 100%);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   box-shadow: var(--shadow-md);
@@ -258,15 +272,18 @@ a:hover { text-decoration: underline; }
   text-decoration: none;
 }
 
-/* ---------- Anmelden-Reiter (Admin heute, später auch Kund:innen) ---------- */
-.nav-login-item {
+/* ---------- Eckbutton oben rechts (Login / Verwaltungs-Sidebar-Auslöser) ----------
+   Bewusst außerhalb von .site-nav ul, damit die Seiten-Reiter unabhängig vom
+   Login-Status immer in einer Zeile Platz haben (siehe site.js). */
+.admin-corner {
   position: relative;
   margin-left: 0.4rem;
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
-.nav-login-btn {
+.admin-corner-btn {
   background: rgba(255, 250, 245, 0.14);
   border: 1px solid rgba(255, 250, 245, 0.35);
   color: var(--on-dark);
@@ -278,11 +295,11 @@ a:hover { text-decoration: underline; }
   transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease);
 }
 
-.nav-login-btn:hover {
+.admin-corner-btn:hover {
   background: rgba(255, 250, 245, 0.26);
 }
 
-.nav-login-btn.is-logged-in {
+.admin-corner-btn.is-logged-in {
   background: var(--ink);
   border-color: var(--ink);
 }
@@ -968,37 +985,6 @@ a:hover { text-decoration: underline; }
 .booking-status-success { color: #15803d; }
 .booking-status-error { color: #b91c1c; }
 
-/* Tabs: "Buchungen" ist immer Standard; "Kalender" wird per JS erst
-   eingeblendet, wenn eine Admin-Session besteht (siehe Skript in
-   buchungen.hbs) – gehört bewusst zusammen mit dem Buchungsformular auf
-   derselben Seite, statt als separater Login-Kasten darunter. */
-.booking-tabs {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.75rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.booking-tab {
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  padding: 0.75rem 0.25rem;
-  margin-bottom: -1px;
-  font-size: 0.98rem;
-  font-weight: 600;
-  color: var(--ink-faint);
-  cursor: pointer;
-}
-
-.booking-tab:hover {
-  color: var(--ink);
-}
-
-.booking-tab.active {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
-}
 
 /* ---------- Admin-Kalender: volle Breite, Monat/Woche umschaltbar ---------- */
 .calendar {
@@ -1222,6 +1208,7 @@ a:hover { text-decoration: underline; }
 .week-day-col {
   position: relative;
   border-left: 1px solid var(--border);
+  cursor: pointer;
 }
 
 .week-hour-line {
@@ -1243,6 +1230,541 @@ a:hover { text-decoration: underline; }
   white-space: nowrap;
   text-overflow: ellipsis;
   box-shadow: var(--shadow-sm);
+}
+
+.booking-form-hint {
+  margin: 0.75rem 0 0;
+  font-size: 0.82rem;
+  color: var(--ink-faint);
+}
+
+/* Status-Kennzeichnung offener Anfragen (Kalender, Tagesdetail, Anfragen-Liste) */
+.status-pill {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+}
+
+.status-pending {
+  background: color-mix(in srgb, #f59e0b 20%, var(--surface));
+  color: #92400e;
+}
+
+.booking-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.btn-tiny {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-accept {
+  border-color: color-mix(in srgb, #15803d 40%, var(--border));
+  color: #15803d;
+}
+
+.btn-accept:hover { background: color-mix(in srgb, #15803d 12%, var(--surface)); }
+
+.btn-decline {
+  border-color: color-mix(in srgb, #b91c1c 40%, var(--border));
+  color: #b91c1c;
+}
+
+.btn-decline:hover { background: color-mix(in srgb, #b91c1c 12%, var(--surface)); }
+
+.calendar-day-badge.is-pending {
+  background: #f59e0b;
+  color: #1a1a1a;
+}
+
+.calendar-day.is-selected .calendar-day-badge.is-pending {
+  background: #fff;
+  color: #92400e;
+}
+
+.week-event.is-pending {
+  background: #f59e0b;
+  color: #1a1a1a;
+  border: 1px dashed #92400e;
+}
+
+.calendar-hint {
+  margin: 1rem 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+}
+
+.hint {
+  color: var(--ink-faint);
+  font-size: 0.9rem;
+}
+
+.btn-add {
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+}
+
+.btn-add:hover {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 6%, var(--surface));
+}
+
+.btn-add-inline {
+  margin-top: 1rem;
+}
+
+/* ---------- Verwaltungs-Sidebar (global, siehe partials/admin-sidebar.hbs) ----------
+   Auf jeder Seite im DOM vorhanden, aber standardmäßig per transform/visibility
+   außerhalb des Sichtbereichs (nicht per [hidden]/display:none – so bleibt das
+   Auf-/Zuklappen sauber animierbar, siehe .is-open). Öffnet sich über den
+   Eckbutton (site.js), sobald eine Admin-Session besteht. */
+.admin-sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 200;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s var(--ease), visibility 0.35s var(--ease);
+}
+
+.admin-sidebar-backdrop.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.admin-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 210;
+  width: min(560px, 100vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 0.35s var(--ease), visibility 0.35s var(--ease);
+}
+
+.admin-sidebar.is-open {
+  transform: translateX(0);
+  visibility: visible;
+}
+
+/* Kopf (Titel/Abmelden/Schließen + Unter-Tabs) bleibt fix stehen, damit
+   Abmelden immer sofort sichtbar ist und die Unter-Tabs nicht je nach
+   Scrollbar-Breite des jeweiligen Unter-Tab-Inhalts (siehe .admin-sidebar-body)
+   unterschiedlich viel Platz haben und deshalb inkonsistent umbrechen. */
+.admin-sidebar-head {
+  flex-shrink: 0;
+  padding: 1.5rem 1.5rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-sidebar-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.admin-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.admin-sidebar-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.admin-sidebar-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-sidebar-logout-btn {
+  background: none;
+  border: none;
+  color: var(--ink-faint);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.admin-sidebar-logout-btn:hover {
+  color: var(--primary);
+}
+
+.admin-sidebar-close {
+  width: 2.1rem;
+  height: 2.1rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-muted);
+  color: var(--ink);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.admin-sidebar-close:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+@media (max-width: 640px) {
+  .admin-sidebar {
+    width: 100vw;
+  }
+}
+
+/* ---------- Verwaltung: Unter-Tabs (Kalender/Anfragen/Öffnungszeiten/Leistungen) ---------- */
+.admin-subtabs {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.admin-subtab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--surface-muted);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink-faint);
+  cursor: pointer;
+}
+
+.admin-subtab:hover {
+  color: var(--ink);
+}
+
+.admin-subtab.active {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.subtab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  padding: 0 0.3rem;
+  margin-left: 0.35rem;
+  border-radius: 999px;
+  background: #f59e0b;
+  color: #1a1a1a;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.subtab-badge[hidden] {
+  display: none;
+}
+
+.admin-subtab.active .subtab-badge {
+  background: #fff;
+  color: #92400e;
+}
+
+/* ---------- Anfragen ---------- */
+.anfragen-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 720px;
+}
+
+/* Immer Text oben, Buttons darunter – bei "justify-content: space-between"
+   auf einer Zeile sprangen die Buttons je nach Textlänge unvorhersehbar mal
+   rechts neben den Text, mal (durch flex-wrap) in eine neue Zeile links. */
+.anfrage-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.6rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.85rem 1.1rem;
+  font-size: 0.9rem;
+}
+
+/* ---------- Öffnungszeiten ---------- */
+.settings-form {
+  max-width: 640px;
+}
+
+.settings-days {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.settings-day-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+}
+
+.settings-day-main,
+.settings-day-break {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Pause-Zeile optisch etwas zurückhaltender als die Öffnungszeiten selbst,
+   damit klar bleibt: das ist eine Ausnahme innerhalb der Öffnungszeit. */
+.settings-day-break {
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--border);
+}
+
+.settings-day-row label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.settings-day-toggle {
+  font-weight: 700;
+}
+
+.settings-break-toggle {
+  color: var(--ink-faint);
+}
+
+.settings-day-row input[type="number"] {
+  width: 100%;
+  margin: 0;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+}
+
+.settings-day-row input[type="number"]:disabled {
+  opacity: 0.5;
+}
+
+.settings-interval-label {
+  display: block;
+  max-width: 320px;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.settings-interval-label select {
+  display: block;
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+}
+
+/* ---------- Leistungen verwalten ---------- */
+.services-admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  max-width: 720px;
+}
+
+.service-admin-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 2px);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.service-admin-row label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.service-admin-row input,
+.service-admin-row textarea {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: normal;
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.service-admin-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.service-price {
+  margin-left: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.service-image-field {
+  margin-bottom: 0.85rem;
+}
+
+.service-image-field-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.service-image-preview-wrap {
+  margin-bottom: 0.65rem;
+}
+
+.service-image-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.service-image-preview img {
+  width: 4.5rem;
+  height: 4.5rem;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.service-image-empty {
+  margin: 0;
+}
+
+/* Überschreibt die generische ".service-admin-row label"-Regel (block,
+   kleinere Schrift, Abstand) – der Upload-Button soll wie ein normaler
+   Button aussehen, nicht wie ein Formularfeld-Label. */
+.service-admin-row .btn-upload-label {
+  display: inline-flex;
+  width: auto;
+  margin-bottom: 0;
+  font-size: 0.85rem;
+  padding: 0.55rem 1.1rem;
+}
+
+/* ---------- Termin-Eintragen-Modal ---------- */
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 1000;
+}
+
+/* [hidden] hat dieselbe Spezifität wie die Klasse oben – ohne diese Regel
+   gewinnt "display: flex" und das Modal bliebe trotz hidden-Attribut sichtbar. */
+.admin-modal-backdrop[hidden] {
+  display: none;
+}
+
+.admin-modal {
+  background: var(--surface);
+  border-radius: calc(var(--radius) + 4px);
+  padding: 2rem;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+}
+
+.admin-modal h3 {
+  margin: 0 0 1.25rem;
+}
+
+.admin-modal label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 1.1rem;
+}
+
+.admin-modal input,
+.admin-modal textarea {
+  display: block;
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: normal;
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.admin-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 @media (max-width: 860px) {
@@ -1281,6 +1803,12 @@ a:hover { text-decoration: underline; }
 
   .calendar-view-toggle {
     align-self: flex-start;
+  }
+
+  .settings-day-main,
+  .settings-day-break {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
 }
 

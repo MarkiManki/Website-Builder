@@ -50,11 +50,22 @@
   // bewusst position:fixed statt sticky (body reserviert via padding-top
   // den Platz, live nachgeführt von watchTopbarLiveHeight() oben). Nav-Tabs
   // werden zum Hamburger-Dropdown zusammengeklappt, sobald gescrollt wurde
-  // ODER der Viewport zu schmal für die Tabs ist – dieselbe "collapsed"-
-  // Logik für beide Fälle, siehe .nav-collapsed im CSS.
+  // ODER der Viewport zu schmal ist – passen die Reiter inhaltlich (z. B. mit
+  // "Verwaltung" nach Admin-Login) nicht mehr in eine Zeile, wickeln sie
+  // stattdessen per CSS (.site-nav ul { flex-wrap: wrap }) einfach in eine
+  // zweite Zeile, statt komplett hinter dem Hamburger zu verschwinden.
+  //
+  // Hysterese statt einer einzelnen Schwelle: ohne sie kippt "scrolled" bei
+  // jedem winzigen Wackeln um genau einen Wert (z. B. Rubber-Banding beim
+  // Touchpad ganz oben auf der Seite) mehrfach hin und her – jedes Kippen
+  // reißt die Reiter zwischen der großen (ggf. mehrzeiligen, siehe
+  // .site-nav ul { flex-wrap: wrap }) und der kompakten Hamburger-Ansicht
+  // hin und her ("springende Reiter"). Mit getrennten Ein-/Ausstiegspunkten
+  // bleibt der Zustand in der Mitte stabil.
   function updateTopbarState() {
     if (!topbar) return;
-    var scrolled = window.scrollY > 8;
+    var wasScrolled = topbar.classList.contains('is-scrolled');
+    var scrolled = wasScrolled ? window.scrollY > 4 : window.scrollY > 24;
     var collapsed = scrolled || narrowQuery.matches;
     var wasCollapsed = topbar.classList.contains('nav-collapsed');
     topbar.classList.toggle('is-scrolled', scrolled);
@@ -90,33 +101,69 @@
     });
   }
 
-  // --- Anmelden-Reiter in der Navigation (auf jeder Seite, siehe nav.hbs).
-  // Heute nur für den Admin-Login, später auch für Kund:innen gedacht. ---
-  var loginToggle = document.getElementById('nav-login-toggle');
+  // --- Eckbutton oben rechts (auf jeder Seite, siehe header.hbs). Ausgeloggt
+  // öffnet er das Login-Popover; eingeloggt öffnet er stattdessen die
+  // Verwaltungs-Sidebar (siehe partials/admin-sidebar.hbs). Bewusst NICHT
+  // Teil der Reiter-Liste (.site-nav ul), damit die Seiten-Reiter unabhängig
+  // vom Login-Status immer in eine Zeile passen. ---
+  var cornerBtn = document.getElementById('admin-corner-btn');
   var loginDropdown = document.getElementById('nav-login-dropdown');
   var loginForm = document.getElementById('nav-login-form');
   var loginError = document.getElementById('nav-login-error');
+  var adminSidebar = document.getElementById('admin-sidebar');
+  var adminSidebarBackdrop = document.getElementById('admin-sidebar-backdrop');
+  var adminSidebarClose = document.getElementById('admin-sidebar-close');
+  var adminSidebarLogout = document.getElementById('admin-sidebar-logout');
+  var isAdminSession = false;
+
+  function openAdminSidebar() {
+    if (!adminSidebar) return;
+    if (window.AdminPanel) window.AdminPanel.init();
+    adminSidebar.classList.add('is-open');
+    adminSidebar.setAttribute('aria-hidden', 'false');
+    if (adminSidebarBackdrop) adminSidebarBackdrop.classList.add('is-open');
+  }
+
+  function closeAdminSidebar() {
+    if (!adminSidebar) return;
+    adminSidebar.classList.remove('is-open');
+    adminSidebar.setAttribute('aria-hidden', 'true');
+    if (adminSidebarBackdrop) adminSidebarBackdrop.classList.remove('is-open');
+  }
 
   function checkNavSession() {
-    if (!loginToggle) return;
+    if (!cornerBtn) return;
     fetch('/api/session')
       .then(function (res) { return res.json(); })
       .then(function (data) {
-        loginToggle.textContent = data.isAdmin ? 'Abmelden' : 'Anmelden';
-        loginToggle.classList.toggle('is-logged-in', !!data.isAdmin);
+        isAdminSession = !!data.isAdmin;
+        cornerBtn.textContent = isAdminSession ? 'Verwaltung' : 'Anmelden';
+        cornerBtn.classList.toggle('is-logged-in', isAdminSession);
       })
       .catch(function () {});
   }
 
-  if (loginToggle) {
-    loginToggle.addEventListener('click', function () {
-      if (loginToggle.classList.contains('is-logged-in')) {
-        fetch('/api/logout', { method: 'POST' }).then(function () {
-          window.location.reload();
-        });
+  if (cornerBtn) {
+    cornerBtn.addEventListener('click', function () {
+      if (isAdminSession) {
+        openAdminSidebar();
         return;
       }
       if (loginDropdown) loginDropdown.hidden = !loginDropdown.hidden;
+    });
+  }
+
+  if (adminSidebarClose) adminSidebarClose.addEventListener('click', closeAdminSidebar);
+  if (adminSidebarBackdrop) adminSidebarBackdrop.addEventListener('click', closeAdminSidebar);
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') closeAdminSidebar();
+  });
+
+  if (adminSidebarLogout) {
+    adminSidebarLogout.addEventListener('click', function () {
+      fetch('/api/logout', { method: 'POST' }).then(function () {
+        window.location.reload();
+      });
     });
   }
 

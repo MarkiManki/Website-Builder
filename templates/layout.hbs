@@ -30,8 +30,10 @@
     {{{body}}}
   </main>
   {{> footer}}
+  {{> admin-sidebar}}
   {{#if preview}}
     <script>{{{inlineJs}}}</script>
+    <script>{{{inlineAdminJs}}}</script>
     <script>
       document.addEventListener('click', function (event) {
         var link = event.target.closest('a[href]');
@@ -44,6 +46,7 @@
     </script>
   {{else}}
     <script src="{{assetPrefix}}js/site.js"></script>
+    <script src="{{assetPrefix}}js/admin.js"></script>
   {{/if}}
 </body>
 </html>

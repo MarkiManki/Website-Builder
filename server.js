@@ -6,8 +6,10 @@ const archiver = require('archiver');
 const { generateSite, renderPreview, slugify, OUTPUT_DIR } = require('./src/generator');
 const { PROFESSIONS } = require('./src/data/professions');
 const { isConfigured: isImageSearchConfigured, searchImageOptions } = require('./src/images');
-const { addBooking, listBookings } = require('./src/bookings');
-const { sendBookingConfirmation } = require('./src/mailer');
+const { addBooking, listBookings, getBooking, setBookingStatus, isSlotTaken, listBookingsForDate } = require('./src/bookings');
+const { sendRequestReceived, sendBookingConfirmed, sendBookingDeclined } = require('./src/mailer');
+const settingsStore = require('./src/settings');
+const servicesStore = require('./src/services');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +17,13 @@ const PORT = process.env.PORT || 3000;
 // Prototyp-Login fürs Testen des Buchungssystems (siehe README). Nur im
 // Speicher des Builder-Servers relevant, keine echte Nutzerverwaltung.
 const ADMIN_CREDENTIALS = { identifier: 'admin', password: 'admin' };
+
+function requireAdmin(req, res, next) {
+  if (!req.session || !req.session.isAdmin) {
+    return res.status(401).json({ error: 'Nicht angemeldet.' });
+  }
+  next();
+}
 
 // Großzügiges Limit: hochgeladene Bilder werden als Data-URI im JSON-Body
 // mitgeschickt (Base64 + mehrere Bild-Slots können mehrere MB ausmachen).
@@ -80,13 +89,21 @@ app.get('/api/session', (req, res) => {
   res.json({ isAdmin: !!(req.session && req.session.isAdmin) });
 });
 
+// Öffentliche Buchung: legt eine ANFRAGE an (status "pending"), noch keine
+// Zusage. Lehnt ab, wenn der Slot schon vergeben ist (pending oder confirmed).
 app.post('/api/bookings', async (req, res) => {
-  const { name, email, date, time, note, skipEmail } = req.body || {};
+  const { name, email, date, time, note, skipEmail, status } = req.body || {};
   if (!name || !email || !date || !time) {
     return res.status(400).json({ error: 'Name, E-Mail, Datum und Uhrzeit sind erforderlich.' });
   }
+  if (isSlotTaken(date, time)) {
+    return res.status(409).json({ error: 'Dieser Termin ist leider schon vergeben. Bitte eine andere Uhrzeit wählen.' });
+  }
 
-  const booking = addBooking({ name, email, date, time, note });
+  // status wird nur für die Beispieldaten-Demo genutzt (immer mit skipEmail
+  // kombiniert) – das echte Buchungsformular legt ausschließlich "pending" an.
+  const initialStatus = skipEmail && ['pending', 'confirmed'].includes(status) ? status : 'pending';
+  const booking = addBooking({ name, email, date, time, note, status: initialStatus });
 
   // skipEmail: von den Beispieldaten genutzt, um beim Anlegen mehrerer
   // Demo-Termine nicht jedes Mal eine (Test-)Bestätigungsmail zu erzeugen.
@@ -95,20 +112,128 @@ app.post('/api/bookings', async (req, res) => {
   }
 
   try {
-    const previewUrl = await sendBookingConfirmation(booking);
+    const previewUrl = await sendRequestReceived(booking);
     res.json({ ok: true, booking, previewUrl });
   } catch (err) {
-    // Buchung ist trotzdem erfolgreich – nur die Bestätigungsmail hat nicht geklappt.
-    console.error('Terminbestätigung konnte nicht gesendet werden:', err.message);
+    // Anfrage ist trotzdem erfolgreich – nur die Eingangsbestätigung hat nicht geklappt.
+    console.error('Eingangsbestätigung konnte nicht gesendet werden:', err.message);
     res.json({ ok: true, booking, previewUrl: null });
   }
 });
 
-app.get('/api/bookings', (req, res) => {
-  if (!req.session || !req.session.isAdmin) {
-    return res.status(401).json({ error: 'Nicht angemeldet.' });
+// Admin trägt einen Termin direkt ein (z. B. nach einem Telefonanruf) – geht
+// sofort auf "confirmed", E-Mail ist optional (Kunde könnte am Telefon keine
+// Adresse genannt haben).
+app.post('/api/bookings/admin', requireAdmin, async (req, res) => {
+  const { name, email, date, time, note, skipEmail } = req.body || {};
+  if (!name || !date || !time) {
+    return res.status(400).json({ error: 'Name, Datum und Uhrzeit sind erforderlich.' });
   }
+  if (isSlotTaken(date, time)) {
+    return res.status(409).json({ error: 'Für diesen Slot besteht bereits ein Termin.' });
+  }
+
+  const booking = addBooking({ name, email, date, time, note, status: 'confirmed' });
+
+  if (skipEmail || !email) {
+    return res.json({ ok: true, booking, previewUrl: null });
+  }
+
+  try {
+    const previewUrl = await sendBookingConfirmed(booking);
+    res.json({ ok: true, booking, previewUrl });
+  } catch (err) {
+    console.error('Bestätigungsmail konnte nicht gesendet werden:', err.message);
+    res.json({ ok: true, booking, previewUrl: null });
+  }
+});
+
+app.post('/api/bookings/:id/confirm', requireAdmin, async (req, res) => {
+  const booking = setBookingStatus(parseInt(req.params.id, 10), 'confirmed');
+  if (!booking) return res.status(404).json({ error: 'Termin nicht gefunden.' });
+  try {
+    const previewUrl = await sendBookingConfirmed(booking);
+    res.json({ ok: true, booking, previewUrl });
+  } catch (err) {
+    console.error('Bestätigungsmail konnte nicht gesendet werden:', err.message);
+    res.json({ ok: true, booking, previewUrl: null });
+  }
+});
+
+app.post('/api/bookings/:id/decline', requireAdmin, async (req, res) => {
+  const booking = setBookingStatus(parseInt(req.params.id, 10), 'declined');
+  if (!booking) return res.status(404).json({ error: 'Termin nicht gefunden.' });
+  try {
+    const previewUrl = await sendBookingDeclined(booking);
+    res.json({ ok: true, booking, previewUrl });
+  } catch (err) {
+    console.error('Absage-Mail konnte nicht gesendet werden:', err.message);
+    res.json({ ok: true, booking, previewUrl: null });
+  }
+});
+
+app.get('/api/bookings', requireAdmin, (req, res) => {
   res.json({ bookings: listBookings() });
+});
+
+// Für das öffentliche Buchungsformular: welche Uhrzeiten sind an diesem
+// Datum grundsätzlich möglich (Öffnungszeiten) und welche davon sind schon
+// vergeben? So kann das Formular bereits belegte Zeiten ausschließen.
+app.get('/api/day-info', (req, res) => {
+  const date = String(req.query.date || '');
+  if (!date) return res.status(400).json({ error: 'Datum erforderlich.' });
+  const daySettings = settingsStore.getDaySettings(date);
+  const taken = listBookingsForDate(date).map((b) => b.time);
+  res.json({ ...daySettings, taken });
+});
+
+app.get('/api/settings', (req, res) => {
+  res.json({ settings: settingsStore.getSettings() });
+});
+
+// Idempotent: übernimmt die im Website-Builder eingestellten Werte nur, wenn
+// noch keine Einstellungen bestehen (verhindert, dass jeder Seitenaufruf
+// bereits vom Admin geänderte Einstellungen wieder überschreibt).
+app.post('/api/settings/seed', (req, res) => {
+  const { startHour, endHour, slotInterval } = req.body || {};
+  const settings = settingsStore.seedIfEmpty({
+    startHour: parseInt(startHour, 10),
+    endHour: parseInt(endHour, 10),
+    slotInterval: parseInt(slotInterval, 10),
+  });
+  res.json({ settings });
+});
+
+app.put('/api/settings', requireAdmin, (req, res) => {
+  const settings = settingsStore.updateSettings(req.body || {});
+  res.json({ settings });
+});
+
+app.get('/api/services', (req, res) => {
+  res.json({ services: servicesStore.listServices() });
+});
+
+app.post('/api/services/seed', (req, res) => {
+  const { services } = req.body || {};
+  const result = servicesStore.seedIfEmpty(Array.isArray(services) ? services : []);
+  res.json({ services: result });
+});
+
+app.post('/api/services', requireAdmin, (req, res) => {
+  const service = servicesStore.addService(req.body || {});
+  res.json({ ok: true, service });
+});
+
+app.put('/api/services/:id', requireAdmin, (req, res) => {
+  const service = servicesStore.updateService(parseInt(req.params.id, 10), req.body || {});
+  if (!service) return res.status(404).json({ error: 'Leistung nicht gefunden.' });
+  res.json({ ok: true, service });
+});
+
+app.delete('/api/services/:id', requireAdmin, (req, res) => {
+  const ok = servicesStore.deleteService(parseInt(req.params.id, 10));
+  if (!ok) return res.status(404).json({ error: 'Leistung nicht gefunden.' });
+  res.json({ ok: true });
 });
 
 app.post('/preview', async (req, res) => {

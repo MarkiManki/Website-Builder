@@ -460,6 +460,8 @@
           instagram: 'https://instagram.com/lumorafotostudio',
           x: '',
           linkedin: '',
+          tiktok: 'https://tiktok.com/@lumorafotostudio',
+          youtube: 'https://youtube.com/@lumorafotostudio',
         },
       },
       logoQuery: 'camera logo icon',
@@ -725,6 +727,8 @@
           instagram: 'https://instagram.com/kammerklinge',
           x: '',
           linkedin: '',
+          tiktok: 'https://tiktok.com/@kammerklinge',
+          youtube: '',
         },
       },
       logoQuery: 'barber shop logo icon',
@@ -1052,6 +1056,10 @@
       const dateStr = date.toISOString().slice(0, 10);
       const customer = DEMO_CUSTOMERS[Math.floor(Math.random() * DEMO_CUSTOMERS.length)];
 
+      // Mix aus bereits bestätigten und noch offenen Anfragen, damit der
+      // Admin-Kalender die beiden Zustände direkt zeigt (siehe Anfragen-Tab).
+      const demoStatus = i < 4 ? 'confirmed' : 'pending';
+
       requests.push(
         fetch('/api/bookings', {
           method: 'POST',
@@ -1063,6 +1071,7 @@
             time,
             note: 'Beispieltermin',
             skipEmail: true,
+            status: demoStatus,
           }),
         }).catch(() => {})
       );
@@ -1086,7 +1095,7 @@
     setValue('business.phone', SAMPLE_DATA.business.phone);
     setValue('business.address', SAMPLE_DATA.business.address);
     setValue('business.profession', SAMPLE_DATA.business.profession);
-    ['facebook', 'instagram', 'x', 'linkedin'].forEach((platform) => {
+    ['facebook', 'instagram', 'x', 'linkedin', 'tiktok', 'youtube'].forEach((platform) => {
       setValue(`business.social.${platform}`, (SAMPLE_DATA.business.social && SAMPLE_DATA.business.social[platform]) || '');
     });
     setValue('design.primaryColor', SAMPLE_DATA.primaryColor);

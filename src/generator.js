@@ -25,7 +25,14 @@ function registerPartials() {
   Handlebars.registerPartial('header', readTemplate('partials/header.hbs'));
   Handlebars.registerPartial('nav', readTemplate('partials/nav.hbs'));
   Handlebars.registerPartial('footer', readTemplate('partials/footer.hbs'));
+  Handlebars.registerPartial('admin-sidebar', readTemplate('partials/admin-sidebar.hbs'));
 }
+
+// Für inline <script>-Blöcke, die Handlebars-Daten (z. B. Leistungen) als
+// JS-Wert einbetten müssen – sicheres JSON, kein </script>-Ausbruch möglich.
+Handlebars.registerHelper('json', function (context) {
+  return JSON.stringify(context || null).replace(/</g, '\\u003c');
+});
 
 const PAGE_TEMPLATE_FILES = {
   home: 'pages/home.hbs',
@@ -159,6 +166,7 @@ function renderPage(pageKey, context, options = {}) {
     preview: !!options.preview,
     inlineCss: options.preview ? readTemplate('assets/css/base.css') : null,
     inlineJs: options.preview ? readTemplate('assets/js/site.js') : null,
+    inlineAdminJs: options.preview ? readTemplate('assets/js/admin.js') : null,
   });
 }
 
@@ -212,6 +220,7 @@ async function generateSite(formData) {
 
   fs.copyFileSync(path.join(TEMPLATES_DIR, 'assets/css/base.css'), path.join(cssDir, 'base.css'));
   fs.copyFileSync(path.join(TEMPLATES_DIR, 'assets/js/site.js'), path.join(jsDir, 'site.js'));
+  fs.copyFileSync(path.join(TEMPLATES_DIR, 'assets/js/admin.js'), path.join(jsDir, 'admin.js'));
 
   return { slug, siteDir };
 }
