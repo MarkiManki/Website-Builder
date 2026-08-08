@@ -1359,7 +1359,7 @@ a:hover { text-decoration: underline; }
   right: 0;
   bottom: 0;
   z-index: 210;
-  width: min(560px, 100vw);
+  width: min(880px, 92vw);
   display: flex;
   flex-direction: column;
   background: var(--surface);

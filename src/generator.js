@@ -57,11 +57,16 @@ function buildContext(formData) {
 
   const enabledPages = buildEnabledPages(selectedPages);
 
-  const navLinks = enabledPages.map((page) => ({
-    key: page.key,
-    href: page.file,
-    label: page.label.split(' / ')[0].split(' (')[0],
-  }));
+  // Impressum bewusst nicht in der Hauptnavigation: schlankere Nav, das
+  // Impressum bleibt trotzdem über den Footer-Link auf jeder Seite in einem
+  // Klick erreichbar (erfüllt § 5 TMG: leicht erkennbar + unmittelbar erreichbar).
+  const navLinks = enabledPages
+    .filter((page) => page.key !== 'impressum')
+    .map((page) => ({
+      key: page.key,
+      href: page.file,
+      label: page.label.split(' / ')[0].split(' (')[0],
+    }));
 
   const footerLinks = enabledPages
     .filter((page) => page.key === 'impressum' || page.key === 'kontakt')
